@@ -10,7 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
+from dotenv import load_dotenv
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,8 +28,33 @@ SECRET_KEY = 'django-insecure-aj1+(n#@oy#adq35zamnmoa22r&)95h7@rq*p6lw_sn6c&-p4^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
+AUTHENTICATION_BACKENDS = [
+    'django_auth_adfs.backend.AdfsAuthCodeBackend',  # Azure AD
+    'django.contrib.auth.backends.ModelBackend',     # Local
+]
+
+AUTH_ADFS = {
+    "TENANT_ID": os.getenv("AZURE_TENANT_ID"),
+    "CLIENT_ID": os.getenv("AZURE_CLIENT_ID"),
+    "CLIENT_SECRET": os.getenv("AZURE_CLIENT_SECRET"),  # <== ESSENCIAL
+    "RESOURCE": os.getenv("AZURE_RESOURCE"),  # normalmente igual ao CLIENT_ID
+    "RELYING_PARTY_ID": os.getenv("AZURE_RELYING_PARTY_ID"),  # pode ser igual ao acima
+    "AUDIENCE": os.getenv("AZURE_AUDIENCE"),  # idem
+    "CLAIM_MAPPING": {
+        "first_name": "given_name",
+        "last_name": "family_name",
+        "email": "upn",
+    },
+    "USERNAME_CLAIM": "upn",
+    "GROUP_CLAIM": "roles",
+}
+
+# Redirecionamento padrão
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/'  # pode ser /dashboard ou outro
+LOGOUT_REDIRECT_URL = '/login/'
 
 # Application definition
 
@@ -37,6 +65,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_auth_adfs',
+    'controlefrota',
 ]
 
 MIDDLEWARE = [
@@ -54,7 +84,7 @@ ROOT_URLCONF = 'frotafacil.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -115,6 +145,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

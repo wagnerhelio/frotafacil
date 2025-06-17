@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Projetos disponíveis</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 50px; }
+        h1 { color: #333; }
+        ul { list-style: none; padding: 0; }
+        li { margin: 15px 0; }
+        a {
+            text-decoration: none;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        a:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Bem-vindo(a), {{ user.username }}!</h1>
+    <p>Escolha um aplicativo para acessar:</p>
+    <ul>
+        <li><a href="/perform/"> 📊 Módulo Perform</a></li>
+        <li><a href="/sspgo/">📊 Módulo SSPGO</a></li>
+        <li><a href="/admin/">Django Administração</a></li>
+    </ul>
+    <p><a href="{% url 'logout' %}">Sair</a></p>
+</body>
+</html>

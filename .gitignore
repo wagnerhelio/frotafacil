@@ -1,0 +1,26 @@
+# Ignora ambientes virtuais
+venv/
+
+# Ignora arquivos do Python
+__pycache__/
+*.py[cod]
+
+# Ignora arquivos do Django
+db.sqlite3
+
+# Ignora arquivos de variáveis de ambiente
+.env
+
+# Ignora arquivos do VSCode
+.vscode/
+
+# Ignora arquivos de cache
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+
+# Ignora arquivos de sistema
+.DS_Store
+Thumbs.db
