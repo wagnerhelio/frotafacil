@@ -6,4 +6,4 @@ from django.contrib.auth.decorators import login_required
 
 @login_required
 def index(request):
-    return HttpResponse("Bem-vindo ao sistema controle_frota!")
+    return render(request, 'listar_veiculo.html')

@@ -32,6 +32,7 @@ ALLOWED_HOSTS = ["*"]
 
 AUTHENTICATION_BACKENDS = [
     'django_auth_adfs.backend.AdfsAuthCodeBackend',  # Azure AD
+    'frotafacil.ldap_backend.ActiveDirectoryBackend',  # LDAP
     'django.contrib.auth.backends.ModelBackend',     # Local
 ]
 
@@ -53,7 +54,7 @@ AUTH_ADFS = {
 
 # Redirecionamento padrão
 LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/'  # pode ser /dashboard ou outro
+LOGIN_REDIRECT_URL = '/'  # Redireciona para home após login
 LOGOUT_REDIRECT_URL = '/login/'
 
 # Application definition
@@ -132,9 +133,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'pt-br'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Sao_Paulo'
 
 USE_I18N = True
 

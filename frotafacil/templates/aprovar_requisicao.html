@@ -1,0 +1,12 @@
+{% extends 'home_veiculo.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Aprovar Requisição</h2>
+    <p>Tem certeza que deseja aprovar a requisição <strong>#{{ requisicao.id }}</strong> do veículo <strong>{{ requisicao.veiculo }}</strong>?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success">Aprovar</button>
+        <a href="{% url 'listar_requisicao' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %} 

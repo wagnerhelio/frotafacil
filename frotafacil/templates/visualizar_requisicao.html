@@ -1,0 +1,27 @@
+{% extends 'home_veiculo.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Visualizar Requisição</h2>
+    <div class="card p-4">
+        <dl class="row">
+            <dt class="col-sm-3">Unidade</dt><dd class="col-sm-9">{{ requisicao.unidade }}</dd>
+            <dt class="col-sm-3">Data Utilização</dt><dd class="col-sm-9">{{ requisicao.data_utilizacao|date:"d/m/Y H:i" }}</dd>
+            <dt class="col-sm-3">Horário</dt><dd class="col-sm-9">{{ requisicao.horario|time:"H:i" }}</dd>
+            <dt class="col-sm-3">Itinerário</dt><dd class="col-sm-9">{{ requisicao.itinerario }}</dd>
+            <dt class="col-sm-3">Natureza do Serviço</dt><dd class="col-sm-9">{{ requisicao.natureza_servico }}</dd>
+            <dt class="col-sm-3">Veículo</dt><dd class="col-sm-9">{{ requisicao.veiculo }}</dd>
+            <dt class="col-sm-3">Nome do Motorista</dt><dd class="col-sm-9">{{ requisicao.nome_motorista }}</dd>
+            <dt class="col-sm-3">Data Saída</dt><dd class="col-sm-9">{% if requisicao.data_saida %}{{ requisicao.data_saida|date:"d/m/Y H:i" }}{% endif %}</dd>
+            <dt class="col-sm-3">Data Chegada</dt><dd class="col-sm-9">{% if requisicao.data_chegada %}{{ requisicao.data_chegada|date:"d/m/Y H:i" }}{% endif %}</dd>
+            <dt class="col-sm-3">KM Saída</dt><dd class="col-sm-9">{{ requisicao.km_saida }}</dd>
+            <dt class="col-sm-3">Motivo da Divergência do KM de Saída</dt><dd class="col-sm-9">{{ requisicao.motivo_km_saida_divergente }}</dd>
+            <dt class="col-sm-3">KM Chegada</dt><dd class="col-sm-9">{{ requisicao.km_chegada }}</dd>
+            <dt class="col-sm-3">Ocorrências</dt><dd class="col-sm-9">{{ requisicao.ocorrencias }}</dd>
+            <dt class="col-sm-3">Nome do Usuário Solicitante</dt><dd class="col-sm-9">{{ requisicao.usuario }}</dd>
+            <dt class="col-sm-3">Status</dt><dd class="col-sm-9">{{ requisicao.get_status_display }}</dd>
+            <dt class="col-sm-3">Status Aprovação</dt><dd class="col-sm-9">{{ requisicao.get_status_aprovacao_display }}</dd>
+        </dl>
+        <a href="{% url 'listar_requisicao' %}" class="btn btn-secondary">Voltar</a>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,92 @@
+{% extends 'home_veiculo.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Gestão de Requisições</h2>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    {% if request.user.is_staff %}
+    <form id="toggle-aprovacao-form" method="post" action="{% url 'toggle_aprovacao_automatica' %}" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn {% if aprovacao_automatica %}btn-success{% else %}btn-secondary{% endif %} mb-3" style="min-width: 180px;">
+            Aprovação Automática: <span id="aprovacao-status">{% if aprovacao_automatica %}ON{% else %}OFF{% endif %}</span>
+        </button>
+    </form>
+    {% endif %}
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-white" style="background-color: #1976D2;">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Total</h5>
+                    <p class="display-4">{{ total }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white" style="background-color: #388E3C;">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Ativas</h5>
+                    <p class="display-4">{{ ativas }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white" style="background-color: #D32F2F;">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Finalizadas</h5>
+                    <p class="display-4">{{ finalizadas }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white" style="background-color: #607d8b;">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Aprovadas</h5>
+                    <p class="display-4">{{ aprovadas }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mb-4">
+        <a href="{% url 'cadastrar_requisicao' %}" class="btn btn-success me-2">Nova Requisição</a>
+        <a href="{% url 'listar_requisicao' %}" class="btn btn-primary">Listar Requisições</a>
+    </div>
+    <h4>Requisições Pendentes de Aprovação</h4>
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Unidade</th>
+                <th>Usuário</th>
+                <th>Veículo</th>
+                <th>Data Utilização</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in requisicoes_pendentes %}
+            <tr>
+                <td>{{ r.id }}</td>
+                <td>{{ r.unidade }}</td>
+                <td>{{ r.usuario }}</td>
+                <td>{{ r.veiculo }}</td>
+                <td>{{ r.data_utilizacao|date:"d/m/Y" }}</td>
+                <td>{{ r.get_status_display }}</td>
+                <td>
+                    {% if request.user.is_staff %}
+                        <a href="{% url 'aprovar_requisicao' r.id %}" class="btn btn-success btn-sm">Aprovar</a>
+                    {% else %}
+                        <span class="text-muted">Aguardando aprovação</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7">Nenhuma requisição pendente de aprovação.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %} 
