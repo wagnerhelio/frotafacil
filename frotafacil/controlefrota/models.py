@@ -4,12 +4,12 @@ from django.db import models
 
 # Create your models here.
 
-class ConfiguracaoSistema(models.Model):
+class ControleAprovacoes(models.Model):
     aprovacao_automatica = models.BooleanField('Aprovação automática de requisições', default=False)
 
     def __str__(self):
-        return f"Aprovação automática: {'ON' if self.aprovacao_automatica else 'OFF'}"
+        return "Controle de Aprovações"
 
     class Meta:
-        verbose_name = 'Configuração do Sistema'
-        verbose_name_plural = 'Configurações do Sistema'
+        verbose_name = 'Controle de Aprovações'
+        verbose_name_plural = 'Controle de Aprovações'

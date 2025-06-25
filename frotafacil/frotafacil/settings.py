@@ -12,8 +12,6 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 import os
 from pathlib import Path
-from dotenv import load_dotenv
-load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -31,18 +29,18 @@ DEBUG = True
 ALLOWED_HOSTS = ["*"]
 
 AUTHENTICATION_BACKENDS = [
-    'django_auth_adfs.backend.AdfsAuthCodeBackend',  # Azure AD
-    'frotafacil.ldap_backend.ActiveDirectoryBackend',  # LDAP
-    'django.contrib.auth.backends.ModelBackend',     # Local
+    'auth_django.backend.DynamicAdfsAuthCodeBackend',  # Azure AD dinâmico
+    'auth_django.ldap_backend.ActiveDirectoryBackend',  # LDAP
+    'django.contrib.auth.backends.ModelBackend',       # Local
 ]
 
+# AUTH_ADFS pode ficar vazio, pois será preenchido dinamicamente
 AUTH_ADFS = {
-    "TENANT_ID": os.getenv("AZURE_TENANT_ID"),
-    "CLIENT_ID": os.getenv("AZURE_CLIENT_ID"),
-    "CLIENT_SECRET": os.getenv("AZURE_CLIENT_SECRET"),  # <== ESSENCIAL
-    "RESOURCE": os.getenv("AZURE_RESOURCE"),  # normalmente igual ao CLIENT_ID
-    "RELYING_PARTY_ID": os.getenv("AZURE_RELYING_PARTY_ID"),  # pode ser igual ao acima
-    "AUDIENCE": os.getenv("AZURE_AUDIENCE"),  # idem
+    "AUDIENCE": "dummy-audience",
+    "CLIENT_ID": "dummy-client-id",
+    "CLIENT_SECRET": "dummy-secret",
+    "TENANT_ID": "dummy-tenant-id",
+    "RELYING_PARTY_ID": "dummy-client-id",
     "CLAIM_MAPPING": {
         "first_name": "given_name",
         "last_name": "family_name",
@@ -53,9 +51,9 @@ AUTH_ADFS = {
 }
 
 # Redirecionamento padrão
-LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/'  # Redireciona para home após login
-LOGOUT_REDIRECT_URL = '/login/'
+LOGIN_URL = '/auth/login/'
+LOGIN_REDIRECT_URL = '/auth/home/'  # Redireciona para home após login
+LOGOUT_REDIRECT_URL = '/auth/login/'
 
 # Application definition
 
@@ -67,7 +65,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_auth_adfs',
+    'auth_django',
     'controlefrota',
+    
 ]
 
 MIDDLEWARE = [
@@ -85,7 +85,7 @@ ROOT_URLCONF = 'frotafacil.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'frotafacil', 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

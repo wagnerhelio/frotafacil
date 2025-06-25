@@ -1,6 +1,6 @@
-{% extends 'home_veiculo.html' %}
+{% extends 'controlefrota/home_veiculo.html' %}
 
-{% block title %}Cadastrar Veículo{% endblock %}
+{% block title %}Editar Veículo{% endblock %}
 
 {% block content %}
 <style>
@@ -64,7 +64,7 @@
 }
 </style>
 
-<h2>Cadastrar Veículo</h2>
+<h2>Editar Veículo</h2>
 <form method="POST">
     {% csrf_token %}
     {{ form.non_field_errors }}
@@ -114,9 +114,8 @@
         </div>
     </div>
     <div class="form-buttons">
-        <button type="submit" class="cadastrar btn btn-primary">Salvar</button>
-        <a href="{% url 'home' %}" class="btn btn-secondary">Voltar ao Menu</a>
-        <a href="{% url 'listar_veiculo' %}" class="btn btn-info">Listar Veículos</a>
+        <button type="submit" class="editar btn btn-primary">Salvar Alterações</button>
+        <a href="{% url 'listar_veiculo' %}" class="btn btn-secondary">Voltar à Lista</a>
     </div>
 </form>
 {% endblock %} 

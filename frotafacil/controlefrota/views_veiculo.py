@@ -9,7 +9,7 @@ def home_veiculo_view(request):
     context = {
         'total_veiculo': total_veiculo,
     }
-    return render(request, 'home_veiculo.html', context)
+    return render(request, 'controlefrota/home_veiculo.html', context)
 
 @login_required
 def cadastrar_veiculo_views(request):
@@ -20,7 +20,7 @@ def cadastrar_veiculo_views(request):
             return redirect('listar_veiculo')
     else:
         form = CadastrarVeiculoForm()
-    return render(request, 'cadastrar_veiculo.html', {'form': form})
+    return render(request, 'controlefrota/cadastrar_veiculo.html', {'form': form})
 
 @login_required
 def editar_veiculo_view(request, veiculo_id):
@@ -34,7 +34,7 @@ def editar_veiculo_view(request, veiculo_id):
     else:
         form = EditarVeiculoForm(instance=veiculo)
 
-    return render(request, 'editar_veiculo.html', {'form': form, 'veiculo': veiculo})
+    return render(request, 'controlefrota/editar_veiculo.html', {'form': form, 'veiculo': veiculo})
 
 @login_required
 def listar_veiculo_views(request):
@@ -56,7 +56,7 @@ def listar_veiculo_views(request):
         'veiculo_list': veiculo_list,
         'total_veiculo': veiculo_list.count(),
     }
-    return render(request, 'listar_veiculo.html', context)
+    return render(request, 'controlefrota/listar_veiculo.html', context)
 
 @login_required
 def excluir_veiculo_view(request, veiculo_id):
@@ -70,4 +70,4 @@ def excluir_veiculo_view(request, veiculo_id):
     else:
         form = ExcluirVeiculoForm()
 
-    return render(request, 'excluir_veiculo.html', {'form': form, 'veiculo': veiculo})
+    return render(request, 'controlefrota/excluir_veiculo.html', {'form': form, 'veiculo': veiculo})

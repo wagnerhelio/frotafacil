@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models_veiculo import Veiculo
 from .models_requisicao import Requisicao
-from .models import ConfiguracaoSistema
+from .models import ControleAprovacoes
 
 @admin.register(Veiculo)
 class VeiculoAdmin(admin.ModelAdmin):
@@ -16,6 +16,6 @@ class RequisicaoAdmin(admin.ModelAdmin):
     list_filter = ('status', 'veiculo')
     search_fields = ('veiculo__placa', 'usuario__username', 'unidade', 'itinerario')
 
-@admin.register(ConfiguracaoSistema)
-class ConfiguracaoSistemaAdmin(admin.ModelAdmin):
+@admin.register(ControleAprovacoes)
+class ControleAprovacoesAdmin(admin.ModelAdmin):
     list_display = ('aprovacao_automatica',)

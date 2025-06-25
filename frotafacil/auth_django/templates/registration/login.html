@@ -120,11 +120,18 @@
             <input type="password" name="password" placeholder="Senha" required>
             <button type="submit">Entrar</button>
         </form>
-        <!-- Login com Microsoft -->
-        <div class="or">ou</div>
-        <a href="{% url 'django_auth_adfs:login' %}">
-            <button type="button">Entrar com Azure AD</button>
-        </a>
+        <div style="margin: 20px 0 10px 0;">
+            <a href="{% url 'django_auth_adfs:login' %}" style="text-decoration: none;">
+                <button type="button" style="width: 100%; background-color: #2F2F2F; color: white; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: bold;">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" alt="Microsoft" style="height: 20px; vertical-align: middle; background: white; border-radius: 3px; padding: 2px;"> Entrar com Azure AD
+                </button>
+            </a>
+        </div>
+        <div style="margin-top: 10px;">
+            <a href="/admin/">
+                <button type="button" style="width: 100%; background-color: #1976D2; color: white; font-weight: bold;">Acessar Django Admin</button>
+            </a>
+        </div>
     </div>
 </body>
-</html>
+</html> 

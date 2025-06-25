@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from .models_veiculo import Veiculo
 from django.http import JsonResponse
-from .models import ConfiguracaoSistema
+from .models import ControleAprovacoes
 from django.views.decorators.http import require_POST
 
 @login_required
@@ -26,9 +26,9 @@ def listar_requisicao(request):
             if form.cleaned_data['data_final']:
                 requisicoes = requisicoes.filter(data_utilizacao__lte=form.cleaned_data['data_final'])
     # Buscar status de aprovação automática
-    config = ConfiguracaoSistema.objects.first()
+    config = ControleAprovacoes.objects.first()
     aprovacao_automatica = config.aprovacao_automatica if config else False
-    return render(request, 'listar_requisicao.html', {'requisicoes': requisicoes, 'form': form, 'aprovacao_automatica': aprovacao_automatica})
+    return render(request, 'controlefrota/listar_requisicao.html', {'requisicoes': requisicoes, 'form': form, 'aprovacao_automatica': aprovacao_automatica})
 
 @login_required
 def cadastrar_requisicao(request):
@@ -39,7 +39,7 @@ def cadastrar_requisicao(request):
             requisicao.usuario = request.user
             # Aprovação automática
             try:
-                config = ConfiguracaoSistema.objects.first()
+                config = ControleAprovacoes.objects.first()
                 if config and config.aprovacao_automatica:
                     requisicao.status_aprovacao = 'aprovada'
             except Exception:
@@ -48,7 +48,7 @@ def cadastrar_requisicao(request):
             return redirect('listar_requisicao')
     else:
         form = RequisicaoForm(user=request.user)
-    return render(request, 'cadastrar_requisicao.html', {'form': form})
+    return render(request, 'controlefrota/cadastrar_requisicao.html', {'form': form})
 
 @login_required
 def finalizar_requisicao(request, pk):
@@ -65,7 +65,7 @@ def finalizar_requisicao(request, pk):
             return redirect('listar_requisicao')
     else:
         form = FinalizarRequisicaoForm(instance=requisicao, veiculo=requisicao.veiculo)
-    return render(request, 'finalizar_requisicao.html', {'form': form, 'requisicao': requisicao})
+    return render(request, 'controlefrota/finalizar_requisicao.html', {'form': form, 'requisicao': requisicao})
 
 @login_required
 def home_requisicao(request):
@@ -75,9 +75,9 @@ def home_requisicao(request):
     aprovadas = Requisicao.objects.filter(status_aprovacao='aprovada').count()
     requisicoes_pendentes = Requisicao.objects.filter(status_aprovacao='pendente')
     # Buscar status de aprovação automática
-    config = ConfiguracaoSistema.objects.first()
+    config = ControleAprovacoes.objects.first()
     aprovacao_automatica = config.aprovacao_automatica if config else False
-    return render(request, 'home_requisicao.html', {
+    return render(request, 'controlefrota/home_requisicao.html', {
         'total': total,
         'ativas': ativas,
         'finalizadas': finalizadas,
@@ -94,7 +94,7 @@ def aprovar_requisicao(request, pk):
         requisicao.save()
         messages.success(request, 'Requisição aprovada com sucesso!')
         return redirect('listar_requisicao')
-    return render(request, 'aprovar_requisicao.html', {'requisicao': requisicao})
+    return render(request, 'controlefrota/aprovar_requisicao.html', {'requisicao': requisicao})
 
 @staff_member_required
 def recusar_requisicao(request, pk):
@@ -104,7 +104,7 @@ def recusar_requisicao(request, pk):
         requisicao.save()
         messages.success(request, 'Requisição recusada com sucesso!')
         return redirect('listar_requisicao')
-    return render(request, 'recusar_requisicao.html', {'requisicao': requisicao})
+    return render(request, 'controlefrota/recusar_requisicao.html', {'requisicao': requisicao})
 
 @login_required
 def editar_requisicao(request, pk):
@@ -120,7 +120,7 @@ def editar_requisicao(request, pk):
             return redirect('listar_requisicao')
     else:
         form = RequisicaoForm(instance=requisicao)
-    return render(request, 'editar_requisicao.html', {'form': form, 'requisicao': requisicao})
+    return render(request, 'controlefrota/editar_requisicao.html', {'form': form, 'requisicao': requisicao})
 
 @staff_member_required
 def excluir_requisicao(request, pk):
@@ -129,7 +129,7 @@ def excluir_requisicao(request, pk):
         requisicao.delete()
         messages.success(request, 'Requisição excluída com sucesso!')
         return redirect('listar_requisicao')
-    return render(request, 'excluir_requisicao.html', {'requisicao': requisicao})
+    return render(request, 'controlefrota/excluir_requisicao.html', {'requisicao': requisicao})
 
 @login_required
 def visualizar_requisicao(request, pk):
@@ -139,7 +139,7 @@ def visualizar_requisicao(request, pk):
         req_anterior = requisicao.veiculo.requisicoes.filter(status='finalizada').exclude(id=requisicao.id).order_by('-data_chegada').first()
         if req_anterior:
             km_saida_sugerido = req_anterior.km_chegada
-    return render(request, 'visualizar_requisicao.html', {'requisicao': requisicao, 'km_saida_sugerido': km_saida_sugerido})
+    return render(request, 'controlefrota/visualizar_requisicao.html', {'requisicao': requisicao, 'km_saida_sugerido': km_saida_sugerido})
 
 @login_required
 def api_ultimo_km_chegada(request, veiculo_id):
@@ -149,7 +149,7 @@ def api_ultimo_km_chegada(request, veiculo_id):
 @staff_member_required
 @require_POST
 def toggle_aprovacao_automatica(request):
-    config, _ = ConfiguracaoSistema.objects.get_or_create(id=1)
+    config, _ = ControleAprovacoes.objects.get_or_create(id=1)
     config.aprovacao_automatica = not config.aprovacao_automatica
     config.save()
     messages.success(request, f"Aprovação automática {'ativada' if config.aprovacao_automatica else 'desativada'} com sucesso!")

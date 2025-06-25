@@ -1,20 +1,16 @@
 import os
 import django
 from django.contrib.auth import get_user_model
-from dotenv import load_dotenv
-
-# Carrega variáveis do .env
-load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '..', '.env'))
 
 # Configura o ambiente do Django
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "memora.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "frotafacil.settings")
 django.setup()
 
 User = get_user_model()
 
-username = os.getenv("DJANGO_SUPERUSER_USERNAME")
-email = os.getenv("DJANGO_SUPERUSER_EMAIL")
-password = os.getenv("DJANGO_SUPERUSER_PASSWORD")
+username = "admin"
+email = "admin@admin.com"
+password = "admin"
 
 if not User.objects.filter(username=username).exists():
     User.objects.create_superuser(
