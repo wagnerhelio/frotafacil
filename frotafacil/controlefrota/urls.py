@@ -4,7 +4,8 @@ from .views_veiculo import (
     editar_veiculo_view,
     listar_veiculo_views,
     excluir_veiculo_view,
-    home_veiculo_view
+    home_veiculo_view,
+    exportar_veiculos_pdf
 )
 from .views_requisicao import (
     listar_requisicao,
@@ -17,6 +18,7 @@ from .views_requisicao import (
     recusar_requisicao,
     visualizar_requisicao,
     toggle_aprovacao_automatica,
+    exportar_requisicoes_pdf
 )
 
 urlpatterns = [
@@ -26,6 +28,7 @@ urlpatterns = [
     path('editar_veiculo/<int:veiculo_id>/', editar_veiculo_view, name='editar_veiculo'),
     path('listar_veiculo/', listar_veiculo_views, name='listar_veiculo'),
     path('excluir_veiculo/<int:veiculo_id>/', excluir_veiculo_view, name='excluir_veiculo'),
+    path('veiculo/exportar_pdf/', exportar_veiculos_pdf, name='exportar_veiculos_pdf'),
     #Requisição
     path('requisicao/', home_requisicao, name='home_requisicao'),
     path('requisicao/cadastrar_requisicao/', cadastrar_requisicao, name='cadastrar_requisicao'),
@@ -37,4 +40,5 @@ urlpatterns = [
     path('requisicao/recusar_requisicao/<int:pk>/', recusar_requisicao, name='recusar_requisicao'),
     path('requisicao/visualizar_requisicao/<int:pk>/', visualizar_requisicao, name='visualizar_requisicao'),
     path('requisicao/toggle_aprovacao_automatica/', toggle_aprovacao_automatica, name='toggle_aprovacao_automatica'),
+    path('requisicao/exportar_pdf/', exportar_requisicoes_pdf, name='exportar_requisicoes_pdf'),
 ]

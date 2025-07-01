@@ -5,10 +5,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from .models_veiculo import Veiculo
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from .models import ControleAprovacoes
 from django.views.decorators.http import require_POST
 from django.conf import settings
+from django.template.loader import render_to_string
+from xhtml2pdf import pisa
 
 @login_required
 def listar_requisicao(request):
@@ -154,4 +156,15 @@ def toggle_aprovacao_automatica(request):
     config.aprovacao_automatica = not config.aprovacao_automatica
     config.save()
     messages.success(request, f"Aprovação automática {'ativada' if config.aprovacao_automatica else 'desativada'} com sucesso!")
-    return redirect('home_requisicao') 
+    return redirect('home_requisicao')
+
+@login_required
+def exportar_requisicoes_pdf(request):
+    requisicoes = Requisicao.objects.all()
+    html_string = render_to_string('controlefrota/requisicoes_pdf.html', {'requisicoes': requisicoes})
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="requisicoes.pdf"'
+    pisa_status = pisa.CreatePDF(html_string, dest=response)
+    if pisa_status.err:
+        return HttpResponse('Erro ao gerar PDF', status=500)
+    return response 

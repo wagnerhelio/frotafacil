@@ -6,6 +6,7 @@
 {% block content %}
 <div class="container mt-4">
     <h2>Requisições de Viatura/Motorista</h2>
+    <a href="{% url 'exportar_requisicoes_pdf' %}" class="btn btn-danger mb-3" target="_blank">Exportar PDF</a>
     <form method="get" class="row g-3 mb-3 align-items-end">
         <div class="col-md-3">{{ form.veiculo.label_tag }} {{ form.veiculo }}</div>
         <div class="col-md-3">{{ form.usuario.label_tag }} {{ form.usuario }}</div>

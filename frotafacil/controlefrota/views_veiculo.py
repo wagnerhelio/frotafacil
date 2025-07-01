@@ -3,6 +3,9 @@ from django.contrib.auth.decorators import login_required
 from .forms_veiculo import CadastrarVeiculoForm, EditarVeiculoForm, ListarVeiculoForm, ExcluirVeiculoForm
 from .models_veiculo import Veiculo 
 from django.conf import settings
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from xhtml2pdf import pisa
 
 @login_required
 def home_veiculo_view(request):
@@ -72,3 +75,14 @@ def excluir_veiculo_view(request, veiculo_id):
         form = ExcluirVeiculoForm()
 
     return render(request, 'controlefrota/excluir_veiculo.html', {'form': form, 'veiculo': veiculo})
+
+@login_required
+def exportar_veiculos_pdf(request):
+    veiculos = Veiculo.objects.all()
+    html_string = render_to_string('controlefrota/veiculos_pdf.html', {'veiculo_list': veiculos})
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="veiculos.pdf"'
+    pisa_status = pisa.CreatePDF(html_string, dest=response)
+    if pisa_status.err:
+        return HttpResponse('Erro ao gerar PDF', status=500)
+    return response

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Relatório de Requisições</title>
+    <style>
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #333; padding: 4px; }
+    </style>
+</head>
+<body>
+    <h2>Lista de Requisições</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Usuário</th>
+                <th>Veículo</th>
+                <th>Data Utilização</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in requisicoes %}
+            <tr>
+                <td>{{ r.id }}</td>
+                <td>{{ r.usuario }}</td>
+                <td>{{ r.veiculo }}</td>
+                <td>{{ r.data_utilizacao|date:"d/m/Y" }}</td>
+                <td>{{ r.get_status_display }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html> 
