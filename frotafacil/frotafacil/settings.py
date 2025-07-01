@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+import sys
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -53,17 +54,17 @@ AUTH_ADFS = {
 }
 
 # Defina o prefixo via variável de ambiente
-PREFIX = '/frotafacil' if os.getenv('PREFIX', '0') == '1' else ''
 
-LOGIN_URL = f'{PREFIX}/auth/login/'
-LOGIN_REDIRECT_URL = f'{PREFIX}/auth/home/'  # Redireciona para home após login
-LOGOUT_REDIRECT_URL = f'{PREFIX}/auth/login/'
-STATIC_URL = f'{PREFIX}/static/'
+if os.environ.get('USE_SCRIPT_NAME') == '1' or 'runserver' not in sys.argv:
+    FORCE_SCRIPT_NAME = '/frotafacil'
+else:
+    FORCE_SCRIPT_NAME = None
 
-# Configurações para o prefixo /frotafacil/
-if PREFIX:
-    FORCE_SCRIPT_NAME = PREFIX
-#FORCE_SCRIPT_NAME = '/frotafacil'
+LOGIN_URL = '/auth/login/'
+LOGIN_REDIRECT_URL = '/auth/home/'  # Redireciona para home após login
+LOGOUT_REDIRECT_URL = '/auth/login/'
+STATIC_URL = '/static/'
+STATIC_ROOT = '/var/www/html/sistemas/static/frotafacil'
 
 # Application definition
 

@@ -1,3 +1,12 @@
+import os
+import sys
+import django
+
+# Inicializa o Django para uso standalone
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'frotafacil.settings')
+django.setup()
+
 import pandas as pd
 from controlefrota.models_veiculo import Veiculo
 from django.db import IntegrityError

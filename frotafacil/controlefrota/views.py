@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 
 @login_required
 def index(request):
-    return render(request, 'controlefrota/listar_veiculo.html', {'PREFIX': settings.PREFIX})
+    return render(request, 'controlefrota/listar_veiculo.html')
 
 def listar_veiculo(request):
-    return render(request, 'controlefrota/listar_veiculo.html', {'PREFIX': settings.PREFIX})
+    return render(request, 'controlefrota/listar_veiculo.html')

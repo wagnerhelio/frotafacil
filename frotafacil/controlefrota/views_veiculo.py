@@ -9,7 +9,6 @@ def home_veiculo_view(request):
     total_veiculo = Veiculo.objects.count()
     context = {
         'total_veiculo': total_veiculo,
-        'PREFIX': settings.PREFIX,
     }
     return render(request, 'controlefrota/home_veiculo.html', context)
 
@@ -22,7 +21,7 @@ def cadastrar_veiculo_views(request):
             return redirect('listar_veiculo')
     else:
         form = CadastrarVeiculoForm()
-    return render(request, 'controlefrota/cadastrar_veiculo.html', {'form': form, 'PREFIX': settings.PREFIX})
+    return render(request, 'controlefrota/cadastrar_veiculo.html', {'form': form})
 
 @login_required
 def editar_veiculo_view(request, veiculo_id):
@@ -36,7 +35,7 @@ def editar_veiculo_view(request, veiculo_id):
     else:
         form = EditarVeiculoForm(instance=veiculo)
 
-    return render(request, 'controlefrota/editar_veiculo.html', {'form': form, 'veiculo': veiculo, 'PREFIX': settings.PREFIX})
+    return render(request, 'controlefrota/editar_veiculo.html', {'form': form, 'veiculo': veiculo})
 
 @login_required
 def listar_veiculo_views(request):
@@ -56,9 +55,8 @@ def listar_veiculo_views(request):
     context = {
         'form': form,
         'veiculo_list': veiculo_list,
-        'total_veiculo': veiculo_list.count(),
-        'PREFIX': settings.PREFIX,
-    }
+        'total_veiculo': veiculo_list.count()
+     }
     return render(request, 'controlefrota/listar_veiculo.html', context)
 
 @login_required
@@ -73,4 +71,4 @@ def excluir_veiculo_view(request, veiculo_id):
     else:
         form = ExcluirVeiculoForm()
 
-    return render(request, 'controlefrota/excluir_veiculo.html', {'form': form, 'veiculo': veiculo, 'PREFIX': settings.PREFIX})
+    return render(request, 'controlefrota/excluir_veiculo.html', {'form': form, 'veiculo': veiculo})

@@ -20,15 +20,17 @@ from .views_requisicao import (
 )
 
 urlpatterns = [
-    path('', home_veiculo_view, name='home_veiculo'),
+    #Veículo
+    path('veiculo/', home_veiculo_view, name='home_veiculo'),
     path('cadastrar_veiculo/', cadastrar_veiculo_views, name='cadastrar_veiculo'),
     path('editar_veiculo/<int:veiculo_id>/', editar_veiculo_view, name='editar_veiculo'),
     path('listar_veiculo/', listar_veiculo_views, name='listar_veiculo'),
     path('excluir_veiculo/<int:veiculo_id>/', excluir_veiculo_view, name='excluir_veiculo'),
-    path('requisicao/', listar_requisicao, name='listar_requisicao'),
+    #Requisição
+    path('requisicao/', home_requisicao, name='home_requisicao'),
     path('requisicao/cadastrar_requisicao/', cadastrar_requisicao, name='cadastrar_requisicao'),
+    path('requisicao/listar_requisicao/', listar_requisicao, name='listar_requisicao'),
     path('requisicao/finalizar_requisicao/<int:pk>/', finalizar_requisicao, name='finalizar_requisicao'),
-    path('requisicao/home/', home_requisicao, name='home_requisicao'),
     path('requisicao/editar_requisicao/<int:pk>/', editar_requisicao, name='editar_requisicao'),
     path('requisicao/excluir_requisicao/<int:pk>/', excluir_requisicao, name='excluir_requisicao'),
     path('requisicao/aprovar_requisicao/<int:pk>/', aprovar_requisicao, name='aprovar_requisicao'),
