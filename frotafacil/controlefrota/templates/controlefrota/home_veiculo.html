@@ -187,10 +187,12 @@
     <div class="sidebar sidebar-expanded" id="sidebar">
         <button class="toggle-btn" id="menu-toggle">☰</button>
         <div class="menu-buttons">
+            {% block menu_itens %}
             <a href="{% url 'cadastrar_veiculo' %}">➕ <span class="menu-text">Cadastrar Veículo</span></a>
             <a href="{% url 'listar_veiculo' %}">📋 <span class="menu-text">Listar Veículo</span></a>
+            {% endblock %}
             <a href="{% url 'home' %}" class="back-btn">🏠 <span class="menu-text">Voltar ao Menu</span></a>
-            <a href="/admin/" class="admin">⚙️ <span class="menu-text">Administração</span></a>
+            <a href="{{ PREFIX }}/admin/" class="admin">⚙️ <span class="menu-text">Administração</span></a>
         </div>
     </div>
     <button class="toggle-btn-floating" id="menu-toggle-floating" style="display:none;">☰</button>

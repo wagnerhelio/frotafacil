@@ -12,10 +12,12 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+load_dotenv()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -50,10 +52,18 @@ AUTH_ADFS = {
     "GROUP_CLAIM": "roles",
 }
 
-# Redirecionamento padrão
-LOGIN_URL = '/auth/login/'
-LOGIN_REDIRECT_URL = '/auth/home/'  # Redireciona para home após login
-LOGOUT_REDIRECT_URL = '/auth/login/'
+# Defina o prefixo via variável de ambiente
+PREFIX = '/frotafacil' if os.getenv('PREFIX', '0') == '1' else ''
+
+LOGIN_URL = f'{PREFIX}/auth/login/'
+LOGIN_REDIRECT_URL = f'{PREFIX}/auth/home/'  # Redireciona para home após login
+LOGOUT_REDIRECT_URL = f'{PREFIX}/auth/login/'
+STATIC_URL = f'{PREFIX}/static/'
+
+# Configurações para o prefixo /frotafacil/
+if PREFIX:
+    FORCE_SCRIPT_NAME = PREFIX
+#FORCE_SCRIPT_NAME = '/frotafacil'
 
 # Application definition
 
@@ -145,7 +155,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]

@@ -17,11 +17,18 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.shortcuts import redirect
+from django.contrib.auth.decorators import login_required
+from django.urls import reverse
+from django.conf import settings
+
+PREFIX = settings.PREFIX
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/', include('auth_django.urls')),
     path('controlefrota/', include('controlefrota.urls')),
     path('oauth2/', include(('django_auth_adfs.urls', 'django_auth_adfs'), namespace='django_auth_adfs')),
-    path('', lambda request: redirect('/auth/login/')),
+    path('', lambda request: redirect(f'{PREFIX}/auth/home/') if request.user.is_authenticated else redirect(f'{PREFIX}/auth/login/')),
+    #path('', lambda request: redirect('/frotafacil/auth/home/') if request.user.is_authenticated else redirect('/frotafacil/auth/login/')),
+
 ]

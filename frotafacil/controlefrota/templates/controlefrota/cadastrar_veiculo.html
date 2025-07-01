@@ -2,6 +2,11 @@
 
 {% block title %}Cadastrar Veículo{% endblock %}
 
+{% block menu_itens %}
+<a href="{% url 'home_veiculo' %}">🚗 <span class="menu-text">Veículo</span></a>
+<a href="{% url 'listar_veiculo' %}">📋 <span class="menu-text">Listar Veículo</span></a>
+{% endblock %}
+
 {% block content %}
 <style>
 .form-veiculo-grid {

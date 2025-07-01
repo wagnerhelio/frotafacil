@@ -1,4 +1,8 @@
 {% extends 'controlefrota/home_veiculo.html' %}
+{% block menu_itens %}
+<a href="{% url 'cadastrar_requisicao' %}">➕ <span class="menu-text">Cadastrar Requisição</span></a>
+<a href="{% url 'listar_requisicao' %}">📋 <span class="menu-text">Listar Requisição</span></a>
+{% endblock %}
 {% block content %}
 <div class="container mt-4">
     <h2>Gestão de Requisições</h2>

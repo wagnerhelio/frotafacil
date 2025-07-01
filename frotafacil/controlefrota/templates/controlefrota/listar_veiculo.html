@@ -2,6 +2,11 @@
 
 {% block title %}Veículos Cadastrados{% endblock %}
 
+{% block menu_itens %}
+<a href="{% url 'home_veiculo' %}">🚗 <span class="menu-text">Veículo</span></a>
+<a href="{% url 'cadastrar_veiculo' %}">➕ <span class="menu-text">Cadastrar Veículo</span></a>
+{% endblock %}
+
 {% block content %}
 <style>
 .table-responsive {
