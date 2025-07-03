@@ -31,7 +31,7 @@ def listar_requisicao(request):
     # Buscar status de aprovação automática
     config = ControleAprovacoes.objects.first()
     aprovacao_automatica = config.aprovacao_automatica if config else False
-    return render(request, 'controlefrota/listar_requisicao.html', {'requisicoes': requisicoes, 'form': form, 'aprovacao_automatica': aprovacao_automatica})
+    return render(request, 'listar_requisicao.html', {'requisicoes': requisicoes, 'form': form, 'aprovacao_automatica': aprovacao_automatica})
 
 @login_required
 def cadastrar_requisicao(request):
@@ -51,7 +51,7 @@ def cadastrar_requisicao(request):
             return redirect('listar_requisicao')
     else:
         form = RequisicaoForm(user=request.user)
-    return render(request, 'controlefrota/cadastrar_requisicao.html', {'form': form})
+    return render(request, 'cadastrar_requisicao.html', {'form': form})
 
 @login_required
 def finalizar_requisicao(request, pk):
@@ -68,7 +68,7 @@ def finalizar_requisicao(request, pk):
             return redirect('listar_requisicao')
     else:
         form = FinalizarRequisicaoForm(instance=requisicao, veiculo=requisicao.veiculo)
-    return render(request, 'controlefrota/finalizar_requisicao.html', {'form': form, 'requisicao': requisicao})
+    return render(request, 'finalizar_requisicao.html', {'form': form, 'requisicao': requisicao})
 
 @login_required
 def home_requisicao(request):
@@ -80,7 +80,7 @@ def home_requisicao(request):
     # Buscar status de aprovação automática
     config = ControleAprovacoes.objects.first()
     aprovacao_automatica = config.aprovacao_automatica if config else False
-    return render(request, 'controlefrota/home_requisicao.html', {
+    return render(request, 'home_requisicao.html', {
         'total': total,
         'ativas': ativas,
         'finalizadas': finalizadas,
@@ -97,7 +97,7 @@ def aprovar_requisicao(request, pk):
         requisicao.save()
         messages.success(request, 'Requisição aprovada com sucesso!')
         return redirect('listar_requisicao')
-    return render(request, 'controlefrota/aprovar_requisicao.html', {'requisicao': requisicao})
+    return render(request, 'aprovar_requisicao.html', {'requisicao': requisicao})
 
 @staff_member_required
 def recusar_requisicao(request, pk):
@@ -107,7 +107,7 @@ def recusar_requisicao(request, pk):
         requisicao.save()
         messages.success(request, 'Requisição recusada com sucesso!')
         return redirect('listar_requisicao')
-    return render(request, 'controlefrota/recusar_requisicao.html', {'requisicao': requisicao})
+    return render(request, 'recusar_requisicao.html', {'requisicao': requisicao})
 
 @login_required
 def editar_requisicao(request, pk):
@@ -123,7 +123,7 @@ def editar_requisicao(request, pk):
             return redirect('listar_requisicao')
     else:
         form = RequisicaoForm(instance=requisicao)
-    return render(request, 'controlefrota/editar_requisicao.html', {'form': form, 'requisicao': requisicao})
+    return render(request, 'editar_requisicao.html', {'form': form, 'requisicao': requisicao})
 
 @staff_member_required
 def excluir_requisicao(request, pk):
@@ -132,7 +132,7 @@ def excluir_requisicao(request, pk):
         requisicao.delete()
         messages.success(request, 'Requisição excluída com sucesso!')
         return redirect('listar_requisicao')
-    return render(request, 'controlefrota/excluir_requisicao.html', {'requisicao': requisicao})
+    return render(request, 'excluir_requisicao.html', {'requisicao': requisicao})
 
 @login_required
 def visualizar_requisicao(request, pk):
@@ -142,7 +142,7 @@ def visualizar_requisicao(request, pk):
         req_anterior = requisicao.veiculo.requisicoes.filter(status='finalizada').exclude(id=requisicao.id).order_by('-data_chegada').first()
         if req_anterior:
             km_saida_sugerido = req_anterior.km_chegada
-    return render(request, 'controlefrota/visualizar_requisicao.html', {'requisicao': requisicao, 'km_saida_sugerido': km_saida_sugerido})
+    return render(request, 'visualizar_requisicao.html', {'requisicao': requisicao, 'km_saida_sugerido': km_saida_sugerido})
 
 @login_required
 def api_ultimo_km_chegada(request, veiculo_id):
@@ -161,7 +161,7 @@ def toggle_aprovacao_automatica(request):
 @login_required
 def exportar_requisicoes_pdf(request):
     requisicoes = Requisicao.objects.all()
-    html_string = render_to_string('controlefrota/requisicoes_pdf.html', {'requisicoes': requisicoes})
+    html_string = render_to_string('requisicoes_pdf.html', {'requisicoes': requisicoes})
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="requisicoes.pdf"'
     pisa_status = pisa.CreatePDF(html_string, dest=response)

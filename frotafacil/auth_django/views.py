@@ -23,7 +23,7 @@ def login_view(request):
             return redirect(reverse('home'))
         else:
             messages.error(request, 'Usuário ou senha inválidos.')
-    return render(request, 'registration/login.html')
+    return render(request, 'login.html')
 
 @login_required
 def logout_view(request):

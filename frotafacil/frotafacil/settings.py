@@ -53,18 +53,15 @@ AUTH_ADFS = {
     "GROUP_CLAIM": "roles",
 }
 
-# Defina o prefixo via variável de ambiente
-
-if os.environ.get('USE_SCRIPT_NAME') == '1' or 'runserver' not in sys.argv:
-    FORCE_SCRIPT_NAME = '/frotafacil'
-else:
-    FORCE_SCRIPT_NAME = None
-
 LOGIN_URL = '/auth/login/'
 LOGIN_REDIRECT_URL = '/auth/home/'  # Redireciona para home após login
 LOGOUT_REDIRECT_URL = '/auth/login/'
+
+STATIC_ROOT = '/var/www/html/sistemas/static'
 STATIC_URL = '/static/'
-STATIC_ROOT = '/var/www/html/sistemas/static/frotafacil'
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
 
 # Application definition
 
@@ -151,14 +148,6 @@ TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
 
 USE_TZ = True
-
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

@@ -1,6 +1,7 @@
 # Models are defined in models_veiculo.py
 from .models_veiculo import Veiculo
 from django.db import models
+from .models_agente import Agente
 
 # Create your models here.
 

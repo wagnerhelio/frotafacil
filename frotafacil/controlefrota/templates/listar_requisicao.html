@@ -1,0 +1,76 @@
+{% extends 'home_veiculo.html' %}
+{% block menu_itens %}
+<a href="{% url 'cadastrar_requisicao' %}">➕ <span class="menu-text">Cadastrar Requisição</span></a>
+<a href="{% url 'home_requisicao' %}">📋 <span class="menu-text">Requisição</span></a>
+{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Requisições de Viatura/Motorista</h2>
+    <a href="{% url 'exportar_requisicoes_pdf' %}" class="btn btn-danger mb-3" target="_blank">Exportar PDF</a>
+    <form method="get" class="row g-3 mb-3 align-items-end">
+        <div class="col-md-3">{{ form.veiculo.label_tag }} {{ form.veiculo }}</div>
+        <div class="col-md-3">{{ form.usuario.label_tag }} {{ form.usuario }}</div>
+        <div class="col-md-2">{{ form.data_inicial.label_tag }} {{ form.data_inicial }}</div>
+        <div class="col-md-2">{{ form.data_final.label_tag }} {{ form.data_final }}</div>
+        <div class="col-md-2">{{ form.data_especifica.label_tag }} {{ form.data_especifica }}</div>
+        <div class="col-md-12">
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+            <a href="{% url 'listar_requisicao' %}" class="btn btn-secondary">Limpar</a>
+        </div>
+    </form>
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Unidade</th>
+                <th>Usuário</th>
+                <th>Veículo</th>
+                <th>Data Utilização</th>
+                <th>Status</th>
+                <th>Aprovação</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in requisicoes %}
+            <tr>
+                <td>{{ r.id }}</td>
+                <td>{{ r.unidade }}</td>
+                <td>{{ r.usuario }}</td>
+                <td>{{ r.veiculo }}</td>
+                <td>{{ r.data_utilizacao|date:"d/m/Y" }}</td>
+                <td>{{ r.get_status_display }}</td>
+                <td>
+                    {% if r.status_aprovacao == 'aprovada' %}
+                        <span class="text-success">Aprovada</span>
+                    {% elif r.status_aprovacao == 'recusada' %}
+                        <span class="text-danger">Recusada</span>
+                    {% else %}
+                        <span class="text-warning">Pendente</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'visualizar_requisicao' r.id %}" class="btn btn-info btn-sm">Visualizar</a>
+                    {% if r.status_aprovacao == 'pendente' %}
+                        <a href="{% url 'editar_requisicao' r.id %}" class="btn btn-primary btn-sm">Editar</a>
+                        {% if request.user.is_staff %}
+                            <a href="{% url 'aprovar_requisicao' r.id %}" class="btn btn-success btn-sm">Aprovar</a>
+                            <a href="{% url 'recusar_requisicao' r.id %}" class="btn btn-danger btn-sm">Recusar</a>
+                            <a href="{% url 'excluir_requisicao' r.id %}" class="btn btn-secondary btn-sm">Excluir</a>
+                        {% endif %}
+                    {% elif r.status_aprovacao == 'aprovada' and r.status == 'ativa' %}
+                        <a href="{% url 'finalizar_requisicao' r.id %}" class="btn btn-warning btn-sm">Finalizar</a>
+                    {% elif r.status_aprovacao == 'aprovada' and r.status == 'finalizada' %}
+                        <span class="text-success">Finalizada</span>
+                    {% elif r.status_aprovacao == 'recusada' %}
+                        <span class="text-danger">Recusada</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7">Nenhuma requisição cadastrada.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %} 

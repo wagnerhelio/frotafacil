@@ -20,6 +20,7 @@ from .views_requisicao import (
     toggle_aprovacao_automatica,
     exportar_requisicoes_pdf
 )
+from .views_agente import home_agente_view, cadastrar_agente_view, listar_agente_view, buscar_ldap_view
 
 urlpatterns = [
     #Veículo
@@ -41,4 +42,8 @@ urlpatterns = [
     path('requisicao/visualizar_requisicao/<int:pk>/', visualizar_requisicao, name='visualizar_requisicao'),
     path('requisicao/toggle_aprovacao_automatica/', toggle_aprovacao_automatica, name='toggle_aprovacao_automatica'),
     path('requisicao/exportar_pdf/', exportar_requisicoes_pdf, name='exportar_requisicoes_pdf'),
+    path('agente/', home_agente_view, name='home_agente'),
+    path('agente/novo/', cadastrar_agente_view, name='cadastrar_agente'),
+    path('agente/listar/', listar_agente_view, name='listar_agente'),
+    path('agente/buscar-ldap/', buscar_ldap_view, name='buscar_ldap'),
 ]

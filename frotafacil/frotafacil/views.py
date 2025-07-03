@@ -1,1 +1,0 @@
-# Este arquivo pode ser usado para views gerais do projeto.

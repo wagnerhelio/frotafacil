@@ -1,0 +1,12 @@
+{% extends 'home_veiculo.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Editar Requisição</h2>
+    <form method="post" class="mt-4">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Salvar Edição</button>
+        <a href="{% url 'listar_requisicao' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %} 

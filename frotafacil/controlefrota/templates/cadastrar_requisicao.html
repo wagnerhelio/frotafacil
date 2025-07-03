@@ -1,0 +1,64 @@
+{% extends 'home_veiculo.html' %}
+{% block menu_itens %}
+<a href="{% url 'home_requisicao' %}">📋 <span class="menu-text">Requisição</span></a>
+<a href="{% url 'listar_requisicao' %}">📋 <span class="menu-text">Listar Requisição</span></a>
+{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Cadastrar Requisição de Viatura/Motorista</h2>
+    <form method="post" class="mt-4">
+        {% csrf_token %}
+        <div class="mb-3">{{ form.unidade.label_tag }} {{ form.unidade }}</div>
+        {{ form.usuario }}
+        <div class="mb-3">{{ form.data_utilizacao.label_tag }} {{ form.data_utilizacao }}</div>
+        <div class="mb-3">{{ form.itinerario.label_tag }} {{ form.itinerario }}</div>
+        <div class="mb-3">{{ form.natureza_servico.label_tag }} {{ form.natureza_servico }}</div>
+        <div class="mb-3">{{ form.veiculo.label_tag }} {{ form.veiculo }}</div>
+        <div class="mb-3">{{ form.nome_motorista.label_tag }} {{ form.nome_motorista }}</div>
+        <button type="submit" class="btn btn-primary">Salvar</button>
+        <a href="{% url 'listar_requisicao' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+<script>
+// Função para buscar o último km_chegada do veículo selecionado
+async function buscarKmChegada(veiculoId) {
+    if (!veiculoId) return '';
+    const resp = await fetch(`/controlefrota/api/ultimo_km_chegada/${veiculoId}/`);
+    if (resp.ok) {
+        const data = await resp.json();
+        return data.km_chegada || '';
+    }
+    return '';
+}
+
+const veiculoField = document.getElementById('id_veiculo');
+const kmSaidaField = document.getElementById('id_km_saida');
+const motivoField = document.getElementById('id_motivo_km_saida_divergente');
+let kmSugerido = '';
+
+if (veiculoField) {
+    veiculoField.addEventListener('change', async function() {
+        kmSugerido = await buscarKmChegada(this.value);
+        if (kmSaidaField && kmSugerido) {
+            kmSaidaField.value = kmSugerido;
+        }
+    });
+}
+
+if (kmSaidaField) {
+    kmSaidaField.addEventListener('input', function() {
+        if (kmSugerido && this.value !== kmSugerido) {
+            motivoField.required = true;
+            if (!motivoField.value) {
+                setTimeout(function() {
+                    alert('O KM de saída está diferente do último KM de chegada registrado. Informe o motivo da divergência.');
+                    motivoField.focus();
+                }, 100);
+            }
+        } else {
+            motivoField.required = false;
+        }
+    });
+}
+</script>
+{% endblock %} 

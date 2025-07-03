@@ -1,0 +1,36 @@
+{% extends 'home_veiculo.html' %}
+{% block title %}Listar Agentes{% endblock %}
+{% block menu_itens %}
+<a href="{% url 'cadastrar_agente' %}">➕ <span class="menu-text">Cadastrar Agente</span></a>
+<a href="{% url 'home_agente' %}">👮 <span class="menu-text">Agente</span></a>
+{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Listar Agentes</h2>
+    <a href="{% url 'home_agente' %}" class="btn btn-secondary mb-3">← Voltar</a>
+    <a href="{% url 'cadastrar_agente' %}" class="btn btn-primary mb-3">➕ Novo Agente</a>
+    
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Email</th>
+                <th>Matrícula</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for agente in agentes %}
+            <tr>
+                <td>{{ agente.nome }}</td>
+                <td>{{ agente.email }}</td>
+                <td>{{ agente.matricula }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3" class="text-center">Nenhum agente cadastrado.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %} 
