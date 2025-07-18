@@ -7,6 +7,7 @@ class ConfiguracaoAutenticacao(models.Model):
     ad_password = models.CharField("Senha AD", max_length=255, blank=True, null=True)
     azure_tenant_id = models.CharField("Azure Tenant ID", max_length=255, blank=True, null=True)
     azure_client_id = models.CharField("Azure Client ID", max_length=255, blank=True, null=True)
+    azure_client_secret = models.CharField("Azure Client Secret", max_length=255, blank=True, null=True)
     azure_resource = models.CharField("Azure Resource", max_length=255, blank=True, null=True)
     azure_audience = models.CharField("Azure Audience", max_length=255, blank=True, null=True)
     azure_relying_party_id = models.CharField("Azure Relying Party ID", max_length=255, blank=True, null=True)

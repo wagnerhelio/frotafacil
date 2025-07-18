@@ -1,11 +1,10 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import BaseBackend
-from django_auth_adfs.backend import AdfsAuthCodeBackend
-from django_auth_adfs.config import settings as adfs_settings
-from auth_django.models import ConfiguracaoAutenticacao
 from ldap3 import Server, Connection, NTLM, ALL, ALL_ATTRIBUTES, SUBTREE
+from auth_django.models import ConfiguracaoAutenticacao
 import os
 import re
+from social_core.backends.azuread import AzureADOAuth2
 
 class DjangoAndLdapBackend(BaseBackend):
     def authenticate(self, request, username=None, password=None):
@@ -79,37 +78,18 @@ class DjangoAndLdapBackend(BaseBackend):
         try:
             return User.objects.get(pk=user_id)
         except User.DoesNotExist:
-            return None 
+            return None
 
-class DynamicAdfsAuthCodeBackend(AdfsAuthCodeBackend):
-    def authenticate(self, request, **kwargs):
-        print("[DEBUG] Iniciando autenticação Azure AD/EntraID...")
-        adfs_config = get_adfs_settings()
-        if adfs_config:
-            print("[DEBUG] Configurações ADFS carregadas do banco de dados.")
-            for key, value in adfs_config.items():
-                setattr(adfs_settings, key, value)
-        else:
-            print("[ERRO] Não foi possível carregar configurações ADFS do banco de dados.")
-        return super().authenticate(request, **kwargs) 
+class DynamicAzureADOAuth2(AzureADOAuth2):
+    def get_key_and_secret(self):
+        config = ConfiguracaoAutenticacao.objects.first()
+        if not config:
+            raise Exception("Configuração do Azure AD não encontrada no admin.")
+        return config.azure_client_id, config.azure_client_secret
 
-def get_adfs_settings():
-    config = ConfiguracaoAutenticacao.objects.first()
-    if not config:
-        print("[ERRO] Configuração de autenticação Azure não encontrada no banco de dados.")
-        return None
-    print("[DEBUG] get_adfs_settings retornando configurações do Azure AD.")
-    return {
-        "AUDIENCE": config.azure_audience,
-        "CLIENT_ID": config.azure_client_id,
-        "TENANT_ID": config.azure_tenant_id,
-        "RELYING_PARTY_ID": config.azure_relying_party_id,
-        "AUTHORITY": f"https://login.microsoftonline.com/{config.azure_tenant_id}",
-        "CLAIM_MAPPING": {
-            "first_name": "given_name",
-            "last_name": "family_name",
-            "email": "upn",
-        },
-        "USERNAME_CLAIM": "upn",
-        "GROUP_CLAIM": "roles",
-    } 
+    def setting(self, name, default=None):
+        if name == 'SOCIAL_AUTH_AZUREAD_OAUTH2_TENANT_ID':
+            config = ConfiguracaoAutenticacao.objects.first()
+            if config:
+                return config.azure_tenant_id
+        return super().setting(name, default) 

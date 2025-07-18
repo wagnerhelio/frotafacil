@@ -32,19 +32,10 @@ DEBUG = True
 ALLOWED_HOSTS = ["*"]
 
 AUTHENTICATION_BACKENDS = [
-    'auth_django.autenticar_usuario.DynamicAdfsAuthCodeBackend',
+    'auth_django.autenticar_usuario.DynamicAzureADOAuth2',  # Azure AD via python-social-auth customizado
     'auth_django.autenticar_usuario.DjangoAndLdapBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
-
-AUTH_ADFS = {
-    "TENANT_ID": "00000000-0000-0000-0000-000000000000",
-    "CLIENT_ID": "00000000-0000-0000-0000-000000000000",
-    "RELYING_PARTY_ID": "api://00000000-0000-0000-0000-000000000000",
-    "RESOURCE": "api://00000000-0000-0000-0000-000000000000",
-    "AUDIENCE": "api://00000000-0000-0000-0000-000000000000",
-    "CA_BUNDLE": False,
-}
 
 LOGIN_URL = '/auth/login/'
 LOGIN_REDIRECT_URL = '/auth/home/'  # Redireciona para home após login

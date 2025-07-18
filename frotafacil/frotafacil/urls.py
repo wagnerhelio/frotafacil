@@ -27,6 +27,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/', include('auth_django.urls')),
     path('controlefrota/', include('controlefrota.urls')),
-    path('oauth2/', include(('django_auth_adfs.urls', 'django_auth_adfs'), namespace='django_auth_adfs')),
+    path('social-auth/', include('social_django.urls', namespace='social')),
     path('', lambda request: redirect(reverse('home')) if request.user.is_authenticated else redirect(reverse('login'))),
 ]

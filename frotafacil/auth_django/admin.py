@@ -4,7 +4,7 @@ from .models import ConfiguracaoAutenticacao
 @admin.register(ConfiguracaoAutenticacao)
 class ConfiguracaoAutenticacaoAdmin(admin.ModelAdmin):
     list_display = (
-        'ad_user', 'azure_tenant_id'
+        'ad_user', 'azure_tenant_id', 'azure_client_id'
     )
     fieldsets = (
         ('Autenticação AD', {

@@ -121,7 +121,7 @@
             <button type="submit">Entrar</button>
         </form>
         <div style="margin: 20px 0 10px 0;">
-            <a href="{% url 'django_auth_adfs:login' %}" style="text-decoration: none;">
+            <a href="{% url 'social:begin' 'azuread-oauth2' %}" style="text-decoration: none;">
                 <button type="button" style="width: 100%; background-color: #2F2F2F; color: white; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: bold;">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" alt="Microsoft" style="height: 20px; vertical-align: middle; background: white; border-radius: 3px; padding: 2px;"> Entrar com Azure AD
                 </button>
