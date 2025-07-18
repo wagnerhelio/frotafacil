@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.urls import reverse
 from django.conf import settings
+from django.utils.http import url_has_allowed_host_and_scheme
 
 # Create your views here.
 
@@ -20,6 +21,9 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
+            next_url = request.GET.get('next')
+            if next_url and url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
+                return redirect(next_url)
             return redirect(reverse('home'))
         else:
             messages.error(request, 'Usuário ou senha inválidos.')

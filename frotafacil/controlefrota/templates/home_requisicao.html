@@ -6,11 +6,6 @@
 {% block content %}
 <div class="container mt-4">
     <h2>Gestão de Requisições</h2>
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert {{ message.tags }}">{{ message }}</div>
-        {% endfor %}
-    {% endif %}
     {% if request.user.is_staff %}
     <form id="toggle-aprovacao-form" method="post" action="{% url 'toggle_aprovacao_automatica' %}" style="display:inline;">
         {% csrf_token %}

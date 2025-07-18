@@ -13,7 +13,7 @@ class ConfiguracaoAutenticacaoAdmin(admin.ModelAdmin):
         ('Autenticação Azure', {
             'fields': (
                 'azure_tenant_id', 'azure_client_id', 'azure_resource',
-                'azure_audience', 'azure_relying_party_id', 'azure_client_secret'
+                'azure_audience', 'azure_relying_party_id'
             )
         }),
     )

@@ -11,6 +11,7 @@ class CadastrarVeiculoForm(forms.ModelForm):
             'potencia_cv': forms.NumberInput(attrs={'step': '0.01'}),
             'valor_atual_mercado': forms.NumberInput(attrs={'step': '0.01'}),
             'observacoes': forms.Textarea(attrs={'rows': 4}),
+            'ativo': forms.CheckboxInput(),
         }
 
 class EditarVeiculoForm(forms.ModelForm):

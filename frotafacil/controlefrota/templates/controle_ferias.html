@@ -1,0 +1,59 @@
+{% extends 'home_agente.html' %}
+{% block title %}Controle de Férias{% endblock %}
+{% block menu_itens %}
+<a href="{% url 'cadastrar_agente' %}">➕ <span class="menu-text">Cadastrar Agente</span></a>
+<a href="{% url 'listar_agente' %}">📋 <span class="menu-text">Listar Agente</span></a>
+<a href="{% url 'home_agente' %}">👮 <span class="menu-text">Agentes</span></a>
+<a href="{% url 'controle_escala' %}">📅 <span class="menu-text">Controle de Escala</span></a>
+<a href="{% url 'home' %}" class="back-btn">🏠 <span class="menu-text">Voltar ao Menu</span></a>
+<a href="{% url 'admin:index' %}" class="admin">⚙️ <span class="menu-text">Administração</span></a>
+{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Controle de Férias dos Agentes</h2>
+    <form method="get" class="mb-3 d-flex align-items-end gap-2">
+        <label for="mes">Mês:</label>
+        <select name="mes" id="mes" class="form-select w-auto">
+            {% for m in meses %}
+            <option value="{{ m.value }}" {% if m.value == mes %}selected{% endif %}>{{ m.nome }}</option>
+            {% endfor %}
+        </select>
+        <label for="ano">Ano:</label>
+        <input type="number" name="ano" id="ano" value="{{ ano }}" class="form-control w-auto" style="max-width:100px;">
+        <button type="submit" class="btn btn-primary">Ver</button>
+    </form>
+    <table class="table table-bordered calendar-table">
+        <thead>
+            <tr>
+                <th>Seg</th>
+                <th>Ter</th>
+                <th>Qua</th>
+                <th>Qui</th>
+                <th>Sex</th>
+                <th>Sáb</th>
+                <th>Dom</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for semana in calendario %}
+            <tr>
+                {% for dia in semana %}
+                <td class="align-top" style="min-width:110px; height:90px;">
+                    {% if dia %}
+                        <div class="day-number fw-bold">{{ dia.day }}</div>
+                        {% for agente in dia.agentes %}
+                            <span class="badge bg-success mb-1">{{ agente.nome }}</span><br>
+                        {% endfor %}
+                    {% endif %}
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<style>
+.calendar-table th, .calendar-table td { text-align: center; vertical-align: top; }
+.day-number { font-size: 1.2em; margin-bottom: 4px; }
+</style>
+{% endblock %} 

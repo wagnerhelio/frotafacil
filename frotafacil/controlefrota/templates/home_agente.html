@@ -166,6 +166,12 @@
             color: white;
         }
 
+        .menu-buttons a.menu-active {
+            background-color: #fff;
+            color: #1976D2 !important;
+            font-weight: bold;
+        }
+
         @media (max-width: 768px) {
             .sidebar {
                 position: absolute;
@@ -187,10 +193,14 @@
     <div class="sidebar sidebar-expanded" id="sidebar">
         <button class="toggle-btn" id="menu-toggle">☰</button>
         <div class="menu-buttons">
+            {% block menu_itens %}
             <a href="{% url 'cadastrar_agente' %}">➕ <span class="menu-text">Cadastrar Agente</span></a>
             <a href="{% url 'listar_agente' %}">📋 <span class="menu-text">Listar Agente</span></a>
+            <a href="{% url 'controle_ferias' %}">📅 <span class="menu-text">Controle de Férias</span></a>
+            <a href="{% url 'controle_escala' %}">📅 <span class="menu-text">Controle de Escala</span></a>
             <a href="{% url 'home' %}" class="back-btn">🏠 <span class="menu-text">Voltar ao Menu</span></a>
             <a href="{% url 'admin:index' %}" class="admin">⚙️ <span class="menu-text">Administração</span></a>
+            {% endblock %}
         </div>
     </div>
     <button class="toggle-btn-floating" id="menu-toggle-floating" style="display:none;">☰</button>
@@ -198,6 +208,18 @@
         <div class="topbar">
             <div class="user-bar">
                 <span>👤 {% if request.session.nome_completo_ad %}{{ request.session.nome_completo_ad }}{% else %}{{ user.username }}{% endif %}!</span>
+                <button id="btn-notificacoes" style="background: none; border: none; cursor: pointer; font-size: 1.5em;" title="Notificações">
+                    <span style="font-size: 1.3em;">🔔</span>
+                </button>
+                <div id="notificacoes-dropdown" style="display:none; position:absolute; right:20px; top:60px; background:#fff; border:1px solid #ccc; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.12); min-width:250px; z-index:1000;">
+                    <div style="padding:10px; border-bottom:1px solid #eee; font-weight:bold; display:flex; justify-content:space-between; align-items:center;">
+                        <span>Notificações</span>
+                        <button id="btn-marcar-lidas" class="btn btn-link btn-sm" style="font-size:1em; color:#1976D2; text-decoration:underline; padding:0;">Marcar todas como lidas</button>
+                    </div>
+                    <ul id="lista-notificacoes" style="list-style:none; margin:0; padding:0; max-height:300px; overflow-y:auto;">
+                        <li style="padding:10px; border-bottom:1px solid #eee;">Carregando...</li>
+                    </ul>
+                </div>
                 <form action="{% url 'logout' %}" method="post" style="margin: 0;">
                     {% csrf_token %}
                     <button type="submit" class="logout-btn">Sair</button>
@@ -205,6 +227,7 @@
             </div>
         </div>
 
+        {% block content %}
         <div class="row mb-4">
             <div class="col-md-4">
                 <div class="card text-white" style="background-color: #1976D2;">
@@ -231,6 +254,7 @@
                 </div>
             </div>
         </div>
+        {% endblock %}
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -262,5 +286,45 @@
         // Inicializa o estado correto
         updateSidebarState();
     </script>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const btn = document.getElementById('btn-notificacoes');
+    const dropdown = document.getElementById('notificacoes-dropdown');
+    const lista = document.getElementById('lista-notificacoes');
+    const btnLidas = document.getElementById('btn-marcar-lidas');
+    function carregarNotificacoes() {
+        fetch('/controlefrota/requisicao/notificacoes/')
+            .then(resp => resp.json())
+            .then(data => {
+                lista.innerHTML = '';
+                if (data.notificacoes.length === 0) {
+                    lista.innerHTML = '<li style="padding:10px; border-bottom:1px solid #eee;">Nenhuma notificação no momento.</li>';
+                } else {
+                    data.notificacoes.forEach(n => {
+                        lista.innerHTML += `<li style="padding:10px; border-bottom:1px solid #eee;"><span>${n.mensagem}</span><br><small style='color:#888;'>${n.criada_em}</small></li>`;
+                    });
+                }
+            });
+    }
+    if (btn && dropdown) {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            dropdown.style.display = dropdown.style.display === 'none' || dropdown.style.display === '' ? 'block' : 'none';
+            if (dropdown.style.display === 'block') carregarNotificacoes();
+        });
+        document.addEventListener('click', function(e) {
+            if (!dropdown.contains(e.target) && e.target !== btn) {
+                dropdown.style.display = 'none';
+            }
+        });
+    }
+    if (btnLidas) {
+        btnLidas.addEventListener('click', function() {
+            fetch('/controlefrota/requisicao/notificacoes_lidas/', {method:'POST', headers:{'X-CSRFToken': (document.querySelector('[name=csrfmiddlewaretoken]')||{}).value}})
+                .then(() => carregarNotificacoes());
+        });
+    }
+});
+</script>
 </body>
 </html> 

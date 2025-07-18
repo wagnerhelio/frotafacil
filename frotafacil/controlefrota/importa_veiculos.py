@@ -11,8 +11,9 @@ import pandas as pd
 from controlefrota.models_veiculo import Veiculo
 from django.db import IntegrityError
 
-# Caminho do arquivo Excel
-excel_path = 'static/Planilha Customizada Veiculos.xlsx'
+# Caminho do arquivo Excel (agora absoluto)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+excel_path = os.path.join(BASE_DIR, 'static', 'Planilha Customizada Veiculos.xlsx')
 
 # Dicionário para converter nome do mês para número
 meses = {

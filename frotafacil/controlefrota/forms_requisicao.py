@@ -9,24 +9,43 @@ class RequisicaoForm(forms.ModelForm):
     class Meta:
         model = Requisicao
         fields = [
-            'unidade', 'usuario', 'data_utilizacao', 'itinerario',
-            'natureza_servico', 'veiculo', 'nome_motorista'
+            'unidade', 'usuario', 'data_utilizacao', 'previsao_termino_utilizacao', 'itinerario',
+            'natureza_servico', 'veiculo'
         ]
         widgets = {
             'data_utilizacao': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'previsao_termino_utilizacao': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
             'usuario': forms.HiddenInput(),
         }
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
-        veiculos_ocupados = [r.veiculo_id for r in Requisicao.objects.filter(status='ativa')]
-        self.fields['veiculo'].queryset = Veiculo.objects.exclude(id__in=veiculos_ocupados)
+        # Buscar todos os veículos
+        self.fields['veiculo'].queryset = Veiculo.objects.all()
+        # Mapear veículos ocupados e suas requisições
+        self.veiculos_ocupados_ids = []
+        self.veiculos_ocupados_info = {}
+        for req in Requisicao.objects.filter(status='ativa'):
+            self.veiculos_ocupados_ids.append(req.veiculo_id)
+            self.veiculos_ocupados_info[req.veiculo_id] = {
+                'requisicao_id': req.id,
+                'previsao_termino': req.previsao_termino_utilizacao
+            }
         now = timezone.localtime()
         self.fields['data_utilizacao'].initial = now.strftime('%Y-%m-%dT%H:%M')
         self.fields['data_utilizacao'].widget.attrs['value'] = now.strftime('%Y-%m-%dT%H:%M')
         if user:
             self.fields['usuario'].initial = user.pk
+
+    def clean(self):
+        cleaned_data = super().clean()
+        data_utilizacao = cleaned_data.get('data_utilizacao')
+        previsao_termino_utilizacao = cleaned_data.get('previsao_termino_utilizacao')
+        if data_utilizacao and previsao_termino_utilizacao:
+            if previsao_termino_utilizacao < data_utilizacao:
+                self.add_error('previsao_termino_utilizacao', 'A previsão de término não pode ser anterior à data de utilização.')
+        return cleaned_data
 
 class FiltrarRequisicaoForm(forms.Form):
     veiculo = forms.ModelChoiceField(queryset=Veiculo.objects.all(), required=False, label='Veículo')
@@ -80,6 +99,10 @@ class FinalizarRequisicaoForm(forms.ModelForm):
         self.km_saida_sugerido = km_sugerido
         self.fields['km_saida'].initial = km_sugerido
         self.fields['km_saida'].widget.attrs['value'] = km_sugerido
+        if km_sugerido:
+            self.fields['km_saida'].widget.attrs['readonly'] = True
+        else:
+            self.fields['km_saida'].widget.attrs.pop('readonly', None)
 
     def clean(self):
         cleaned = super().clean()

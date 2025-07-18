@@ -10,7 +10,6 @@ class ConfiguracaoAutenticacao(models.Model):
     azure_resource = models.CharField("Azure Resource", max_length=255, blank=True, null=True)
     azure_audience = models.CharField("Azure Audience", max_length=255, blank=True, null=True)
     azure_relying_party_id = models.CharField("Azure Relying Party ID", max_length=255, blank=True, null=True)
-    azure_client_secret = models.CharField("Azure Client Secret", max_length=255, blank=True, null=True)
 
     def __str__(self):
         return "Configuração de Autenticação"

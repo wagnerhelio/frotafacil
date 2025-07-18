@@ -18,9 +18,12 @@ from .views_requisicao import (
     recusar_requisicao,
     visualizar_requisicao,
     toggle_aprovacao_automatica,
-    exportar_requisicoes_pdf
+    exportar_requisicoes_pdf,
+    reivindicar_requisicao,
+    notificacoes_usuario,
+    marcar_notificacoes_lidas
 )
-from .views_agente import home_agente_view, cadastrar_agente_view, listar_agente_view, buscar_ldap_view
+from .views_agente import home_agente_view, cadastrar_agente_view, listar_agente_view, buscar_ldap_view, editar_agente_view, excluir_agente_view, controle_ferias_view, controle_escala_view
 
 urlpatterns = [
     #Veículo
@@ -42,8 +45,15 @@ urlpatterns = [
     path('requisicao/visualizar_requisicao/<int:pk>/', visualizar_requisicao, name='visualizar_requisicao'),
     path('requisicao/toggle_aprovacao_automatica/', toggle_aprovacao_automatica, name='toggle_aprovacao_automatica'),
     path('requisicao/exportar_pdf/', exportar_requisicoes_pdf, name='exportar_requisicoes_pdf'),
+    path('requisicao/reivindicar_requisicao/<int:pk>/', reivindicar_requisicao, name='reivindicar_requisicao'),
+    path('requisicao/notificacoes/', notificacoes_usuario, name='notificacoes_usuario'),
+    path('requisicao/notificacoes_lidas/', marcar_notificacoes_lidas, name='marcar_notificacoes_lidas'),
     path('agente/', home_agente_view, name='home_agente'),
     path('agente/novo/', cadastrar_agente_view, name='cadastrar_agente'),
     path('agente/listar/', listar_agente_view, name='listar_agente'),
     path('agente/buscar-ldap/', buscar_ldap_view, name='buscar_ldap'),
+    path('agente/editar/<int:pk>/', editar_agente_view, name='editar_agente'),
+    path('agente/excluir/<int:pk>/', excluir_agente_view, name='excluir_agente'),
+    path('agente/ferias/', controle_ferias_view, name='controle_ferias'),
+    path('agente/escala/', controle_escala_view, name='controle_escala'),
 ]

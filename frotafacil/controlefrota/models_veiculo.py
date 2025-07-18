@@ -23,6 +23,7 @@ class Veiculo(models.Model):
     estado_conservacao = models.CharField(max_length=50, blank=True, null=True)
     valor_atual_mercado = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     observacoes = models.TextField(blank=True, null=True)
+    ativo = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.placa} - {self.modelo} ({self.ano_fabricacao})"

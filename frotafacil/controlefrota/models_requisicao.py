@@ -30,6 +30,7 @@ class Requisicao(models.Model):
     assinatura_usuario = models.CharField(max_length=100, blank=True)
     motivo_km_saida_divergente = models.TextField(blank=True)
     nome_motorista = models.CharField(max_length=100, blank=True)
+    previsao_termino_utilizacao = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f"Requisição {self.id} - {self.veiculo} - {self.usuario}"

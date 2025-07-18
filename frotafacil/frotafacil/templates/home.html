@@ -187,6 +187,21 @@
         <div class="topbar">
             <div class="user-bar">
                 <span>👤 {% if request.session.nome_completo_ad %}{{ request.session.nome_completo_ad }}{% else %}{{ user.username }}{% endif %}!</span>
+                <button id="btn-notificacoes" style="background: none; border: none; cursor: pointer; font-size: 1.5em;" title="Notificações">
+                    <span style="font-size: 1.3em;">🔔</span>
+                </button>
+                <div id="notificacoes-dropdown" style="display:none; position:absolute; right:20px; top:60px; background:#fff; border:1px solid #ccc; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.12); min-width:250px; z-index:1000;">
+                    <div style="padding:10px; border-bottom:1px solid #eee; font-weight:bold;">Notificações</div>
+                    <ul style="list-style:none; margin:0; padding:0; max-height:300px; overflow-y:auto;">
+                        {% if messages %}
+                            {% for message in messages %}
+                                <li style="padding:10px; border-bottom:1px solid #eee;" class="alert {{ message.tags }}">{{ message }}</li>
+                            {% endfor %}
+                        {% else %}
+                            <li style="padding:10px; border-bottom:1px solid #eee;">Nenhuma notificação no momento.</li>
+                        {% endif %}
+                    </ul>
+                </div>
                 <form action="{% url 'logout' %}" method="post" style="margin: 0;">
                     {% csrf_token %}
                     <button type="submit" class="logout-btn">Sair</button>
@@ -194,30 +209,7 @@
             </div>
         </div>
         <div class="row mb-4">
-            <div class="col-md-4">
-                <div class="card text-white" style="background-color: #1976D2;">
-                    <div class="card-body">
-                        <h5 class="card-title">Total de Veículos</h5>
-                        <p class="card-text display-4">{{ total_veiculo }}</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card text-white" style="background-color: #388E3C;">
-                    <div class="card-body">
-                        <h5 class="card-title">Veículos Ativos</h5>
-                        <p class="card-text display-4">{{ veiculo_ativo }}</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card text-white" style="background-color: #D32F2F;">
-                    <div class="card-body">
-                        <h5 class="card-title">Veículos Inativos</h5>
-                        <p class="card-text display-4">{{ veiculo_inativo }}</p>
-                    </div>
-                </div>
-            </div>
+            <!-- KPIs removidos conforme solicitado -->
         </div>
         <div class="row">
             <div class="col-md-4 mb-4">
@@ -291,5 +283,22 @@
         // Inicializa o estado correto
         updateSidebarState();
     </script>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const btn = document.getElementById('btn-notificacoes');
+    const dropdown = document.getElementById('notificacoes-dropdown');
+    if (btn && dropdown) {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            dropdown.style.display = dropdown.style.display === 'none' || dropdown.style.display === '' ? 'block' : 'none';
+        });
+        document.addEventListener('click', function(e) {
+            if (!dropdown.contains(e.target) && e.target !== btn) {
+                dropdown.style.display = 'none';
+            }
+        });
+    }
+});
+</script>
 </body>
 </html>

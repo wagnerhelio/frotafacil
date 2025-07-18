@@ -1,8 +1,13 @@
-{% extends 'home_veiculo.html' %}
+{% extends 'home_agente.html' %}
 {% block title %}Cadastrar Agente{% endblock %}
 {% block menu_itens %}
-<a href="{% url 'home_agente' %}">👮 <span class="menu-text">Agente</span></a>
+<a href="{% url 'home_agente' %}">👮 <span class="menu-text">Agentes</span></a>
 <a href="{% url 'listar_agente' %}">📋 <span class="menu-text">Listar Agente</span></a>
+<a href="{% url 'controle_ferias' %}">📅 <span class="menu-text">Controle de Férias</span></a>
+<a href="{% url 'controle_escala' %}">📅 <span class="menu-text">Controle de Escala</span></a>
+<a href="{% url 'home' %}" class="back-btn">🏠 <span class="menu-text">Voltar ao Menu</span></a>
+<a href="{% url 'admin:index' %}" class="admin">⚙️ <span class="menu-text">Administração</span></a>
+
 {% endblock %}
 {% block content %}
 <div class="container mt-4">
@@ -11,6 +16,7 @@
     
     <form method="post">
         {% csrf_token %}
+        {{ form.non_field_errors }}
         <div class="row">
             <div class="col-md-6">
                 <div class="mb-3">
@@ -19,6 +25,7 @@
                         {{ form.matricula }}
                         <button type="button" class="btn btn-primary" id="btnBuscar">🔍 Buscar</button>
                     </div>
+                    {{ form.matricula.errors }}
                 </div>
             </div>
         </div>
@@ -27,12 +34,44 @@
                 <div class="mb-3">
                     <label for="nome" class="form-label">Nome *</label>
                     {{ form.nome }}
+                    {{ form.nome.errors }}
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="mb-3">
                     <label for="email" class="form-label">Email *</label>
                     {{ form.email }}
+                    {{ form.email.errors }}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="ativo" class="form-label">Ativo</label>
+                    {{ form.ativo }}
+                    {{ form.ativo.errors }}
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="data_inicio_escala" class="form-label">Início da Escala</label>
+                    {{ form.data_inicio_escala }}
+                    {{ form.data_inicio_escala.errors }}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="ferias_inicio" class="form-label">Início das Férias</label>
+                    {{ form.ferias_inicio }}
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="ferias_fim" class="form-label">Fim das Férias</label>
+                    {{ form.ferias_fim }}
                 </div>
             </div>
         </div>

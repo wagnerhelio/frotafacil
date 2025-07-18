@@ -11,10 +11,70 @@
         <div class="mb-3">{{ form.unidade.label_tag }} {{ form.unidade }}</div>
         {{ form.usuario }}
         <div class="mb-3">{{ form.data_utilizacao.label_tag }} {{ form.data_utilizacao }}</div>
+        <div class="mb-3">{{ form.previsao_termino_utilizacao.label_tag }} {{ form.previsao_termino_utilizacao }}</div>
         <div class="mb-3">{{ form.itinerario.label_tag }} {{ form.itinerario }}</div>
         <div class="mb-3">{{ form.natureza_servico.label_tag }} {{ form.natureza_servico }}</div>
-        <div class="mb-3">{{ form.veiculo.label_tag }} {{ form.veiculo }}</div>
-        <div class="mb-3">{{ form.nome_motorista.label_tag }} {{ form.nome_motorista }}</div>
+        <div class="mb-3">
+            {{ form.veiculo.label_tag }}
+            <select name="veiculo" id="id_veiculo" class="form-control">
+                <option value="">---------</option>
+                {% for v in veiculos_info %}
+                    {% if v.ocupado %}
+                        <option value="{{ v.id }}" style="color:gray;" data-ocupado="1" data-requisicao-id="{{ v.requisicao_id }}" data-previsao-termino="{{ v.previsao_termino|date:'d/m/Y H:i' }}" disabled>
+                            {{ v.label }} (OCUPADO - PREVISÃO DE TERMINO: {{ v.previsao_termino|date:'d/m/Y H:i' }})
+                        </option>
+                    {% else %}
+                        <option value="{{ v.id }}">{{ v.label }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+            <div id="msg-veiculo-ocupado" style="color: #b94a48; margin-top: 5px; display: none;"></div>
+        </div>
+        <script>
+        function getSelectedOptionInfo() {
+            const select = document.getElementById('id_veiculo');
+            const opt = select.options[select.selectedIndex];
+            if (opt && opt.dataset && opt.dataset.ocupado) {
+                return {
+                    id: opt.dataset.requisicaoId,
+                    previsao: opt.dataset.previsaoTermino
+                };
+            }
+            return null;
+        }
+        document.getElementById('id_veiculo').addEventListener('change', function() {
+            const info = getSelectedOptionInfo();
+            const msgDiv = document.getElementById('msg-veiculo-ocupado');
+            if (info) {
+                msgDiv.innerText = `Veículo com requisição ID ${info.id} em aberto. Previsão término utilização: ${info.previsao}`;
+                msgDiv.style.display = 'block';
+            } else {
+                msgDiv.innerText = '';
+                msgDiv.style.display = 'none';
+            }
+        });
+        </script>
+        <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dataUtilizacao = document.getElementById('id_data_utilizacao');
+    const previsaoTermino = document.getElementById('id_previsao_termino_utilizacao');
+    const form = dataUtilizacao ? dataUtilizacao.form : null;
+    if (dataUtilizacao && previsaoTermino && form) {
+        // Atualiza o mínimo do campo previsão ao mudar data_utilizacao
+        dataUtilizacao.addEventListener('change', function() {
+            previsaoTermino.min = dataUtilizacao.value;
+        });
+        // Validação ao submeter
+        form.addEventListener('submit', function(e) {
+            if (previsaoTermino.value && dataUtilizacao.value && previsaoTermino.value < dataUtilizacao.value) {
+                e.preventDefault();
+                alert('A previsão de término não pode ser anterior à data de utilização!');
+                previsaoTermino.focus();
+            }
+        });
+    }
+});
+</script>
         <button type="submit" class="btn btn-primary">Salvar</button>
         <a href="{% url 'listar_requisicao' %}" class="btn btn-secondary">Cancelar</a>
     </form>

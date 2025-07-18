@@ -32,25 +32,18 @@ DEBUG = True
 ALLOWED_HOSTS = ["*"]
 
 AUTHENTICATION_BACKENDS = [
-    'auth_django.backend.DynamicAdfsAuthCodeBackend',  # Azure AD dinâmico
-    'auth_django.ldap_backend.ActiveDirectoryBackend',  # LDAP
-    'django.contrib.auth.backends.ModelBackend',       # Local
+    'auth_django.autenticar_usuario.DynamicAdfsAuthCodeBackend',
+    'auth_django.autenticar_usuario.DjangoAndLdapBackend',
+    'django.contrib.auth.backends.ModelBackend',
 ]
 
-# AUTH_ADFS pode ficar vazio, pois será preenchido dinamicamente
 AUTH_ADFS = {
-    "AUDIENCE": "dummy-audience",
-    "CLIENT_ID": "dummy-client-id",
-    "CLIENT_SECRET": "dummy-secret",
-    "TENANT_ID": "dummy-tenant-id",
-    "RELYING_PARTY_ID": "dummy-client-id",
-    "CLAIM_MAPPING": {
-        "first_name": "given_name",
-        "last_name": "family_name",
-        "email": "upn",
-    },
-    "USERNAME_CLAIM": "upn",
-    "GROUP_CLAIM": "roles",
+    "TENANT_ID": "00000000-0000-0000-0000-000000000000",
+    "CLIENT_ID": "00000000-0000-0000-0000-000000000000",
+    "RELYING_PARTY_ID": "api://00000000-0000-0000-0000-000000000000",
+    "RESOURCE": "api://00000000-0000-0000-0000-000000000000",
+    "AUDIENCE": "api://00000000-0000-0000-0000-000000000000",
+    "CA_BUNDLE": False,
 }
 
 LOGIN_URL = '/auth/login/'

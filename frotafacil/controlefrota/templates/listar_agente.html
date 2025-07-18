@@ -1,8 +1,14 @@
-{% extends 'home_veiculo.html' %}
+{% extends 'home_agente.html' %}
+
 {% block title %}Listar Agentes{% endblock %}
+
 {% block menu_itens %}
 <a href="{% url 'cadastrar_agente' %}">➕ <span class="menu-text">Cadastrar Agente</span></a>
-<a href="{% url 'home_agente' %}">👮 <span class="menu-text">Agente</span></a>
+<a href="{% url 'home_agente' %}">👮 <span class="menu-text">Agentes</span></a>
+<a href="{% url 'controle_ferias' %}">📅 <span class="menu-text">Controle de Férias</span></a>
+<a href="{% url 'controle_escala' %}">📅 <span class="menu-text">Controle de Escala</span></a>
+<a href="{% url 'home' %}" class="back-btn">🏠 <span class="menu-text">Voltar ao Menu</span></a>
+<a href="{% url 'admin:index' %}" class="admin">⚙️ <span class="menu-text">Administração</span></a>
 {% endblock %}
 {% block content %}
 <div class="container mt-4">
@@ -16,6 +22,10 @@
                 <th>Nome</th>
                 <th>Email</th>
                 <th>Matrícula</th>
+                <th>Início das Férias</th>
+                <th>Fim das Férias</th>
+                <th>Início da Escala</th>
+                <th>Ações</th>
             </tr>
         </thead>
         <tbody>
@@ -24,10 +34,17 @@
                 <td>{{ agente.nome }}</td>
                 <td>{{ agente.email }}</td>
                 <td>{{ agente.matricula }}</td>
+                <td>{{ agente.ferias_inicio }}</td>
+                <td>{{ agente.ferias_fim }}</td>
+                <td>{{ agente.data_inicio_escala }}</td>
+                <td>
+                    <a href="{% url 'editar_agente' agente.pk %}" class="btn btn-sm btn-primary">Editar</a>
+                    <a href="{% url 'excluir_agente' agente.pk %}" class="btn btn-sm btn-danger">Excluir</a>
+                </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="3" class="text-center">Nenhum agente cadastrado.</td>
+                <td colspan="6" class="text-center">Nenhum agente cadastrado.</td>
             </tr>
             {% endfor %}
         </tbody>

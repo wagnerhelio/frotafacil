@@ -1,10 +1,5 @@
 {% extends 'home_veiculo.html' %}
 {% block content %}
-{% if messages %}
-    {% for message in messages %}
-        <div class="alert {{ message.tags }}">{{ message }}</div>
-    {% endfor %}
-{% endif %}
 <div class="container mt-4">
     <h2>Finalizar Requisição</h2>
     <p>Preencha os dados finais para finalizar a requisição <strong>#{{ requisicao.id }}</strong> do veículo <strong>{{ requisicao.veiculo }}</strong>:</p>
@@ -23,13 +18,16 @@
             <div class="alert alert-danger">{{ form.data_chegada.errors.0 }}</div>
         {% endif %}
         </div>
-        <div class="mb-3">{{ form.km_saida.label_tag }} {{ form.km_saida }}
-        {% if km_saida_sugerido %}
-            <small class="form-text text-muted">Sugerido: {{ km_saida_sugerido }}</small>
-        {% endif %}
-        {% if form.km_saida.errors %}
-            <div class="alert alert-danger">{{ form.km_saida.errors.0 }}</div>
-        {% endif %}
+        <div class="mb-3 d-flex align-items-center" style="gap:8px;">
+            {{ form.km_saida.label_tag }}
+            {{ form.km_saida }}
+            {% if km_saida_sugerido %}
+                <button type="button" id="btn-alterar-km" class="btn btn-secondary btn-sm">Alterar</button>
+            {% endif %}
+            <input type="hidden" id="id_km_saida_sugerido" value="{{ km_saida_sugerido }}">
+            {% if form.km_saida.errors %}
+                <div class="alert alert-danger">{{ form.km_saida.errors.0 }}</div>
+            {% endif %}
         </div>
         <div class="mb-3" id="motivo-div" style="display:none;">
             {{ form.motivo_km_saida_divergente.label_tag }} {{ form.motivo_km_saida_divergente }}
@@ -49,7 +47,6 @@
         <a href="{% url 'listar_requisicao' %}" class="btn btn-secondary">Cancelar</a>
     </form>
     <script>
-    // Garantir valor inicial correto para campos datetime-local
     document.addEventListener('DOMContentLoaded', function() {
         const dataSaida = document.getElementById('id_data_saida');
         const dataChegada = document.getElementById('id_data_chegada');
@@ -60,26 +57,55 @@
         }
         if (dataSaida && !dataSaida.value) dataSaida.value = nowStr();
         if (dataChegada && !dataChegada.value) dataChegada.value = nowStr();
-    });
-    // Mostra/oculta o campo motivo se km_saida for diferente do sugerido
-    const kmSaida = document.getElementById('id_km_saida');
-    const kmSugerido = document.getElementById('id_km_saida_sugerido');
-    const motivoDiv = document.getElementById('motivo-div');
-    const motivo = document.getElementById('id_motivo_km_saida_divergente');
-    function toggleMotivo() {
-        if (kmSugerido.value && kmSaida.value !== kmSugerido.value) {
-            motivoDiv.style.display = '';
-            motivo.required = true;
-        } else {
-            motivoDiv.style.display = 'none';
-            motivo.required = false;
-            motivo.value = '';
+
+        // Mostra/oculta o campo motivo se km_saida for diferente do sugerido
+        const kmSaida = document.getElementById('id_km_saida');
+        const kmSugerido = document.getElementById('id_km_saida_sugerido');
+        const motivoDiv = document.getElementById('motivo-div');
+        const motivo = document.getElementById('id_motivo_km_saida_divergente');
+        const btnAlterar = document.getElementById('btn-alterar-km');
+        // Esconde o campo motivo ao carregar
+        if (motivoDiv) motivoDiv.style.display = 'none';
+        function toggleMotivo() {
+            if (kmSugerido.value && kmSaida.value !== kmSugerido.value && !kmSaida.readOnly) {
+                motivoDiv.style.display = '';
+                motivo.required = true;
+            } else {
+                motivoDiv.style.display = 'none';
+                motivo.required = false;
+                motivo.value = '';
+            }
         }
-    }
-    if (kmSaida && kmSugerido && motivoDiv && motivo) {
-        kmSaida.addEventListener('input', toggleMotivo);
-        window.addEventListener('DOMContentLoaded', toggleMotivo);
-    }
+        if (kmSaida && kmSugerido && motivoDiv && motivo) {
+            kmSaida.addEventListener('input', toggleMotivo);
+            toggleMotivo();
+        }
+        if (btnAlterar && kmSaida && motivoDiv && motivo) {
+            btnAlterar.addEventListener('click', function() {
+                kmSaida.readOnly = false;
+                kmSaida.focus();
+                motivoDiv.style.display = '';
+                motivo.required = true;
+            });
+        }
+        // Esconde o botão Alterar se não houver sugerido
+        if (!kmSugerido.value && btnAlterar) {
+            btnAlterar.style.display = 'none';
+        }
+        // Validação no submit do formulário
+        const form = document.querySelector('form');
+        if (form && kmSaida && kmSugerido && motivo) {
+            form.addEventListener('submit', function(e) {
+                if (!kmSaida.readOnly && kmSugerido.value && kmSaida.value !== kmSugerido.value && !motivo.value.trim()) {
+                    motivoDiv.style.display = '';
+                    motivo.required = true;
+                    motivo.focus();
+                    alert('Informe o motivo da divergência do KM de saída.');
+                    e.preventDefault();
+                }
+            });
+        }
+    });
     </script>
 </div>
 <style>
@@ -105,6 +131,18 @@
     background: #fdeaea;
     color: #a94442;
     border: 1px solid #f5c6cb;
+}
+#id_km_saida[readonly] {
+    background-color: #e9ecef;
+    color: #6c757d;
+    cursor: not-allowed;
+}
+#id_km_saida:not([readonly]) {
+    background-color: #fff;
+    color: #212529;
+    cursor: text;
+    border: 2px solid #1976D2;
+    box-shadow: 0 0 0 2px #1976D233;
 }
 </style>
 {% endblock %} 

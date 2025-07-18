@@ -6,11 +6,13 @@ from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from .models_veiculo import Veiculo
 from django.http import JsonResponse, HttpResponse
-from .models import ControleAprovacoes
+from .models import ControleAprovacoes, Notificacao
 from django.views.decorators.http import require_POST
 from django.conf import settings
 from django.template.loader import render_to_string
 from xhtml2pdf import pisa
+from .models_agente import Agente
+from django.core.exceptions import PermissionDenied
 
 @login_required
 def listar_requisicao(request):
@@ -31,7 +33,12 @@ def listar_requisicao(request):
     # Buscar status de aprovação automática
     config = ControleAprovacoes.objects.first()
     aprovacao_automatica = config.aprovacao_automatica if config else False
-    return render(request, 'listar_requisicao.html', {'requisicoes': requisicoes, 'form': form, 'aprovacao_automatica': aprovacao_automatica})
+    pode_reivindicar = False
+    if request.user.is_superuser:
+        pode_reivindicar = True
+    else:
+        pode_reivindicar = Agente.objects.filter(email=request.user.email).exists()
+    return render(request, 'listar_requisicao.html', {'requisicoes': requisicoes, 'form': form, 'aprovacao_automatica': aprovacao_automatica, 'pode_reivindicar': pode_reivindicar})
 
 @login_required
 def cadastrar_requisicao(request):
@@ -51,13 +58,28 @@ def cadastrar_requisicao(request):
             return redirect('listar_requisicao')
     else:
         form = RequisicaoForm(user=request.user)
-    return render(request, 'cadastrar_requisicao.html', {'form': form})
+    # Montar lista de veículos com informações de ocupação
+    veiculos_info = []
+    for v in form.fields['veiculo'].queryset:
+        ocupado = v.id in getattr(form, 'veiculos_ocupados_ids', [])
+        info = getattr(form, 'veiculos_ocupados_info', {}).get(v.id, {})
+        veiculos_info.append({
+            'id': v.id,
+            'label': str(v),
+            'ocupado': ocupado,
+            'requisicao_id': info.get('requisicao_id'),
+            'previsao_termino': info.get('previsao_termino'),
+        })
+    return render(request, 'cadastrar_requisicao.html', {'form': form, 'veiculos_info': veiculos_info})
 
 @login_required
 def finalizar_requisicao(request, pk):
     requisicao = get_object_or_404(Requisicao, pk=pk)
     if requisicao.status_aprovacao != 'aprovada':
         messages.error(request, 'A requisição só pode ser finalizada se estiver aprovada.')
+        return redirect('listar_requisicao')
+    if not requisicao.nome_motorista:
+        messages.error(request, 'A requisição deve ser reivindicada por um motorista antes de ser finalizada.')
         return redirect('listar_requisicao')
     if request.method == 'POST':
         form = FinalizarRequisicaoForm(request.POST, instance=requisicao, veiculo=requisicao.veiculo)
@@ -68,7 +90,8 @@ def finalizar_requisicao(request, pk):
             return redirect('listar_requisicao')
     else:
         form = FinalizarRequisicaoForm(instance=requisicao, veiculo=requisicao.veiculo)
-    return render(request, 'finalizar_requisicao.html', {'form': form, 'requisicao': requisicao})
+    km_saida_sugerido = getattr(form, 'km_saida_sugerido', '')
+    return render(request, 'finalizar_requisicao.html', {'form': form, 'requisicao': requisicao, 'km_saida_sugerido': km_saida_sugerido})
 
 @login_required
 def home_requisicao(request):
@@ -125,8 +148,10 @@ def editar_requisicao(request, pk):
         form = RequisicaoForm(instance=requisicao)
     return render(request, 'editar_requisicao.html', {'form': form, 'requisicao': requisicao})
 
-@staff_member_required
+@login_required
 def excluir_requisicao(request, pk):
+    if not (request.user.is_staff or request.user.is_superuser):
+        raise PermissionDenied
     requisicao = get_object_or_404(Requisicao, pk=pk)
     if request.method == 'POST':
         requisicao.delete()
@@ -168,3 +193,46 @@ def exportar_requisicoes_pdf(request):
     if pisa_status.err:
         return HttpResponse('Erro ao gerar PDF', status=500)
     return response 
+
+@login_required
+def reivindicar_requisicao(request, pk):
+    requisicao = get_object_or_404(Requisicao, pk=pk)
+    pode_reivindicar = request.user.is_superuser or Agente.objects.filter(email=request.user.email).exists()
+    if not pode_reivindicar:
+        messages.error(request, 'Você não tem permissão para reivindicar esta requisição.')
+        return redirect('listar_requisicao')
+    if requisicao.nome_motorista:
+        messages.warning(request, 'Esta requisição já possui motorista vinculado.')
+        return redirect('listar_requisicao')
+    if request.user.is_superuser:
+        nome_motorista = request.user.get_full_name() or request.user.username
+    else:
+        agente = Agente.objects.get(email=request.user.email)
+        nome_motorista = agente.nome
+    requisicao.nome_motorista = nome_motorista
+    requisicao.save()
+    # Notificação persistente
+    Notificacao.objects.create(
+        usuario=request.user,
+        mensagem=f'Você foi vinculado como motorista da requisição #{requisicao.id} do veículo {requisicao.veiculo}.'
+    )
+    messages.success(request, 'Você foi vinculado como motorista desta requisição!')
+    return redirect('listar_requisicao') 
+
+@login_required
+def notificacoes_usuario(request):
+    notificacoes = Notificacao.objects.filter(usuario=request.user, lida=False).order_by('-criada_em')
+    data = [
+        {
+            'id': n.id,
+            'mensagem': n.mensagem,
+            'criada_em': n.criada_em.strftime('%d/%m/%Y %H:%M')
+        } for n in notificacoes
+    ]
+    return JsonResponse({'notificacoes': data})
+
+@login_required
+@require_POST
+def marcar_notificacoes_lidas(request):
+    Notificacao.objects.filter(usuario=request.user, lida=False).update(lida=True)
+    return JsonResponse({'ok': True}) 

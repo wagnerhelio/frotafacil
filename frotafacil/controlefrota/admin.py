@@ -2,6 +2,7 @@ from django.contrib import admin
 from .models_veiculo import Veiculo
 from .models_requisicao import Requisicao
 from .models import ControleAprovacoes
+from .models_agente import Agente
 
 @admin.register(Veiculo)
 class VeiculoAdmin(admin.ModelAdmin):

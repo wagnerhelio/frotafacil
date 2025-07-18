@@ -1,0 +1,280 @@
+{% extends 'home_agente.html' %}
+{% block title %}Controle de Escala{% endblock %}
+{% block menu_itens %}
+<a href="{% url 'cadastrar_agente' %}">➕ <span class="menu-text">Cadastrar Agente</span></a>
+<a href="{% url 'listar_agente' %}">📋 <span class="menu-text">Listar Agente</span></a>
+<a href="{% url 'controle_ferias' %}">📅 <span class="menu-text">Controle de Férias</span></a>
+<a href="{% url 'home_agente' %}">👮 <span class="menu-text">Agentes</span></a>
+<a href="{% url 'home' %}" class="back-btn">🏠 <span class="menu-text">Voltar ao Menu</span></a>
+<a href="{% url 'admin:index' %}" class="admin">⚙️ <span class="menu-text">Administração</span></a>
+{% endblock %}
+{% block content %}
+{% comment %} Remover {% load controlefrota_extras %} {% endcomment %}
+<div class="container mt-4">
+    <h2>Controle de Escala dos Agentes</h2>
+    <form method="get" class="mb-3 d-flex align-items-end gap-2" id="form-filtro-escala">
+        <label for="mes">Mês:</label>
+        <select name="mes" id="mes" class="form-select w-auto">
+            {% for m in meses %}
+            <option value="{{ m.value }}" {% if m.value == mes %}selected{% endif %}>{{ m.nome }}</option>
+            {% endfor %}
+        </select>
+        <label for="ano">Ano:</label>
+        <input type="number" name="ano" id="ano" value="{{ ano }}" class="form-control w-auto" style="max-width:100px;">
+        <button type="submit" class="btn btn-primary">Ver</button>
+        <button type="button" class="btn btn-warning ms-2" id="recalcular-mes">Recalcular mês</button>
+    </form>
+    <table class="table table-bordered calendar-table" style="font-size:13px;">
+        <thead>
+            <tr>
+                <th></th>
+                {% for letra, is_fds in dias_semana_header %}
+                    {% if is_fds %}
+                        <th style="padding:2px; background-color:#cce3f7;">{{ letra }}</th>
+                    {% else %}
+                        <th style="padding:2px;">{{ letra }}</th>
+                    {% endif %}
+                {% endfor %}
+                <th>TOTAL Dias</th>
+                <th>TOTAL Horas</th>
+            </tr>
+            <tr>
+                <th>NOME</th>
+                {% for semana in calendario %}
+                    {% for dia in semana %}
+                        {% if dia %}
+                            <th style="padding:2px;">{{ dia.day }}</th>
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
+                <th>TOTAL Dias</th>
+                <th>TOTAL Horas</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for agente, linha_status, total_dias in agentes_status %}
+            <tr>
+                <td>{{ agente.nome }}</td>
+                {% for status in linha_status %}
+                    <td style="padding:2px; cursor:pointer;" class="celula-status" data-agente-id="{{ agente.id }}" data-dia="{{ ano }}-{{ mes|stringformat:'02d' }}-{{ forloop.counter|stringformat:'02d' }}" data-status="{{ status }}">
+                        <span class="status-text">{{ status|default_if_none:"&nbsp;" }}</span>
+                    </td>
+                {% endfor %}
+                <td>{{ total_dias }}</td>
+                <td>{% for ag, horas in horas_agentes %}{% if ag.id == agente.id %}{{ horas }}{% endif %}{% endfor %}</td>
+            </tr>
+            {% endfor %}
+            <tr style="background:#f5f5f5;font-weight:bold;">
+                <td>Contingente diário</td>
+                {% for semana in calendario %}
+                    {% for dia in semana %}
+                        {% if dia %}
+                            <td>
+                                {{ dia.agentes|length }}
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
+                <td colspan="2"></td>
+            </tr>
+        </tbody>
+    </table>
+    <button type="button" class="btn btn-success mt-3" id="salvar-escala">Salvar Escala</button>
+    <div class="mt-3">
+        <strong>Legenda:</strong><br>
+        <span style="font-weight:bold;">X</span>: Escala &nbsp; 
+        <span style="font-weight:bold;">F</span>: Férias &nbsp; 
+        <span style="font-weight:bold;">P</span>: Permuta &nbsp; 
+        <span style="font-weight:bold;">R</span>: Remanejamento &nbsp; 
+        <span style="font-weight:bold;">V</span>: Viagem &nbsp; 
+        <span style="font-weight:bold;">C</span>: Compensação &nbsp; 
+        <span style="font-weight:bold;">L</span>: Licença médica
+    </div>
+</div>
+<style>
+.calendar-table th, .calendar-table td { text-align: center; vertical-align: top; }
+.day-number { font-size: 1.2em; margin-bottom: 4px; }
+.agente-badge { cursor: grab; }
+.drop-dia { background: #f8f9fa; }
+.drop-dia.drag-over { background: #d0ebff; }
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let dragged = null;
+    let origemDia = null;
+    // Drag start
+    document.querySelectorAll('.agente-badge').forEach(function(badge) {
+        badge.addEventListener('dragstart', function(e) {
+            dragged = badge;
+            origemDia = badge.closest('.drop-dia');
+            e.dataTransfer.setData('text/plain', badge.dataset.agenteId);
+            setTimeout(() => badge.style.display = 'none', 0);
+        });
+        badge.addEventListener('dragend', function(e) {
+            badge.style.display = '';
+            dragged = null;
+            origemDia = null;
+        });
+    });
+    // Drag over e drop nas células
+    document.querySelectorAll('.drop-dia').forEach(function(cell) {
+        cell.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            cell.classList.add('drag-over');
+        });
+        cell.addEventListener('dragleave', function(e) {
+            cell.classList.remove('drag-over');
+        });
+        cell.addEventListener('drop', function(e) {
+            e.preventDefault();
+            cell.classList.remove('drag-over');
+            if (dragged && origemDia && origemDia !== cell) {
+                // Verifica se já existe o agente neste dia
+                var existe = cell.querySelector('.agente-badge[data-agente-id="' + dragged.dataset.agenteId + '"]');
+                if (!existe) {
+                    // Remover do dia original
+                    origemDia.querySelector('.agentes-dia').removeChild(dragged);
+                    // Adicionar ao novo dia
+                    cell.querySelector('.agentes-dia').appendChild(dragged);
+                } else {
+                    // Se já existe, apenas remove do dia original
+                    origemDia.querySelector('.agentes-dia').removeChild(dragged);
+                }
+            }
+        });
+    });
+    // Botão salvar escala
+    document.getElementById('salvar-escala').addEventListener('click', function() {
+        var btn = this;
+        btn.disabled = true;
+        var originalText = btn.innerHTML;
+        btn.innerHTML = 'Salvando...';
+        btn.classList.remove('btn-success');
+        btn.classList.add('btn-secondary');
+        // Montar objeto escala: { 'YYYY-MM-DD': { 'agente_id': 'status', ... } }
+        var escala = {};
+        document.querySelectorAll('.celula-status').forEach(function(cell) {
+            var dia = cell.getAttribute('data-dia');
+            var agente = cell.getAttribute('data-agente-id');
+            var status = cell.getAttribute('data-status') || '';
+            if (!escala[dia]) escala[dia] = {};
+            escala[dia][agente] = status;
+        });
+        fetch('', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify({escala: escala})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                btn.innerHTML = '✅ Salvo!';
+                btn.classList.remove('btn-secondary');
+                btn.classList.add('btn-success');
+                setTimeout(function() {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }, 2000);
+            } else {
+                btn.innerHTML = originalText;
+                btn.classList.remove('btn-secondary');
+                btn.classList.add('btn-success');
+                btn.disabled = false;
+                alert('Erro ao salvar escala!');
+            }
+        })
+        .catch(error => {
+            btn.innerHTML = originalText;
+            btn.classList.remove('btn-secondary');
+            btn.classList.add('btn-success');
+            btn.disabled = false;
+            alert('Erro ao salvar escala!');
+        });
+    });
+});
+document.getElementById('recalcular-mes').addEventListener('click', function() {
+    if (!confirm('Tem certeza que deseja recalcular toda a escala do mês? Isso irá sobrescrever as alterações manuais.')) return;
+    var mes = document.getElementById('mes').value;
+    var ano = document.getElementById('ano').value;
+    fetch(window.location.pathname + '?mes=' + mes + '&ano=' + ano, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({recalcular: true})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.reload();
+        } else {
+            alert('Erro ao recalcular escala!');
+        }
+    })
+    .catch(error => {
+        alert('Erro ao recalcular escala!');
+    });
+});
+// Menu de seleção de status
+const statusOptions = [
+    {val: '', label: '(Em branco)'},
+    {val: 'X', label: 'Escala'},
+    {val: 'F', label: 'Férias'},
+    {val: 'P', label: 'Permuta'},
+    {val: 'R', label: 'Remanejamento'},
+    {val: 'V', label: 'Viagem'},
+    {val: 'C', label: 'Compensação'},
+    {val: 'L', label: 'Licença médica'}
+];
+let statusMenu = null;
+function createStatusMenu(cell) {
+    if (statusMenu) statusMenu.remove();
+    statusMenu = document.createElement('div');
+    statusMenu.style.position = 'absolute';
+    statusMenu.style.background = '#fff';
+    statusMenu.style.border = '1px solid #ccc';
+    statusMenu.style.zIndex = 1000;
+    statusMenu.style.boxShadow = '2px 2px 8px #aaa';
+    statusMenu.style.padding = '2px 0';
+    statusMenu.className = 'status-menu-popup';
+    statusOptions.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.innerText = `${opt.val} - ${opt.label}`;
+        btn.style.display = 'block';
+        btn.style.width = '100%';
+        btn.style.border = 'none';
+        btn.style.background = 'none';
+        btn.style.textAlign = 'left';
+        btn.style.padding = '2px 8px';
+        btn.style.cursor = 'pointer';
+        btn.onmouseover = () => btn.style.background = '#eee';
+        btn.onmouseout = () => btn.style.background = 'none';
+        btn.onclick = function() {
+            cell.querySelector('.status-text').innerText = opt.val;
+            cell.setAttribute('data-status', opt.val);
+            statusMenu.remove();
+        };
+        statusMenu.appendChild(btn);
+    });
+    document.body.appendChild(statusMenu);
+    // Posicionar menu
+    const rect = cell.getBoundingClientRect();
+    statusMenu.style.left = (rect.left + window.scrollX) + 'px';
+    statusMenu.style.top = (rect.bottom + window.scrollY) + 'px';
+}
+document.querySelectorAll('.celula-status').forEach(cell => {
+    cell.addEventListener('click', function(e) {
+        e.stopPropagation();
+        createStatusMenu(cell);
+    });
+});
+document.addEventListener('click', function() {
+    if (statusMenu) statusMenu.remove();
+});
+</script>
+{% endblock %} 

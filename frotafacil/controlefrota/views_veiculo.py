@@ -9,9 +9,14 @@ from xhtml2pdf import pisa
 
 @login_required
 def home_veiculo_view(request):
-    total_veiculo = Veiculo.objects.count()
+    from .models_veiculo import Veiculo
+    total_veiculo = Veiculo.objects.filter(ativo=True).count()
+    veiculo_ativo = total_veiculo
+    veiculo_inativo = Veiculo.objects.filter(ativo=False).count()
     context = {
         'total_veiculo': total_veiculo,
+        'veiculo_ativo': veiculo_ativo,
+        'veiculo_inativo': veiculo_inativo,
     }
     return render(request, 'home_veiculo.html', context)
 
@@ -55,10 +60,14 @@ def listar_veiculo_views(request):
         if form.cleaned_data['ano_fabricacao']:
             veiculo_list = veiculo_list.filter(ano_fabricacao=form.cleaned_data['ano_fabricacao'])
 
+    veiculo_ativo = veiculo_list.filter(ativo=True).count()
+    veiculo_inativo = veiculo_list.filter(ativo=False).count()
     context = {
         'form': form,
         'veiculo_list': veiculo_list,
-        'total_veiculo': veiculo_list.count()
+        'total_veiculo': veiculo_list.count(),
+        'veiculo_ativo': veiculo_ativo,
+        'veiculo_inativo': veiculo_inativo,
      }
     return render(request, 'listar_veiculo.html', context)
 

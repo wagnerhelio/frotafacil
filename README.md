@@ -40,7 +40,8 @@ cd frotafacil
 ```bash
 # Windows
 python -m venv frotafacil-env
-frotafacil-env\Scripts\activate
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+.\frotafacil-env\Scripts\activate
 
 # Linux/macOS
 python3 -m venv frotafacil-env
@@ -50,14 +51,6 @@ source frotafacil-env/bin/activate
 ### 3. Instale as dependências
 ```bash
 pip install -r requirements.txt
-```
-
-### 4. Configure as variáveis de ambiente
-```bash
-cp env_example .env
-# Edite o arquivo .env conforme seu ambiente
-# No Windows, use PREFIX=0
-# No Linux, use PREFIX=1
 ```
 
 ### 5. Execute as migrações
@@ -203,3 +196,73 @@ Link do Projeto: [https://github.com/seu-usuario/frotafacil](https://github.com/
 - [Bootstrap](https://getbootstrap.com/)
 - [Azure AD](https://azure.microsoft.com/)
 - [LDAP](https://www.openldap.org/)
+
+## Implantação
+
+### Ajustando permissões do banco de dados SQLite
+
+Após subir o projeto no servidor Linux, ajuste as permissões do arquivo do banco de dados para evitar erros de "readonly database" ao rodar com Apache:
+
+```bash
+# Dê a posse do arquivo do banco para o usuário do Apache
+chown www-data:www-data /var/www/html/sistemas/frotafacil-env/frotafacil/db.sqlite3
+
+# Dê permissão de leitura e escrita para o usuário e grupo
+chmod 664 /var/www/html/sistemas/frotafacil-env/frotafacil/db.sqlite3
+
+# Dê permissão de escrita no diretório onde está o banco
+chown www-data:www-data /var/www/html/sistemas/frotafacil-env/frotafacil/
+chmod 775 /var/www/html/sistemas/frotafacil-env/frotafacil/
+```
+
+Se o Apache estiver rodando como outro usuário, substitua `www-data` pelo usuário correto.
+
+### Reiniciando o Apache e monitorando logs
+
+Após ajustar as permissões, reinicie o serviço do Apache para garantir que as alterações tenham efeito:
+
+```bash
+service apache2 restart
+```
+
+Se quiser limpar o log de erros antes de testar novamente:
+
+```bash
+truncate -s 0 /var/log/apache2/error.log
+```
+
+Para monitorar o log de erros em tempo real:
+
+```bash
+tail -f /var/log/apache2/error.log
+```
+
+## Corrigindo erro de banco de dados SQLite readonly
+
+Se aparecer o erro:
+
+```
+django.db.utils.OperationalError: attempt to write a readonly database
+```
+
+Execute os comandos abaixo (ajuste o caminho se necessário):
+
+```bash
+# Dê a posse do arquivo do banco para o usuário do Apache
+chown www-data:www-data /var/www/html/sistemas/frotafacil-env/frotafacil/db.sqlite3
+
+# Dê permissão de leitura e escrita para o usuário e grupo
+chmod 664 /var/www/html/sistemas/frotafacil-env/frotafacil/db.sqlite3
+
+# Dê permissão de escrita no diretório onde está o banco
+chown www-data:www-data /var/www/html/sistemas/frotafacil-env/frotafacil/
+chmod 775 /var/www/html/sistemas/frotafacil-env/frotafacil/
+```
+
+Depois, reinicie o Apache:
+
+```bash
+service apache2 restart
+```
+
+Se o Apache estiver rodando como outro usuário, substitua `www-data` pelo usuário correto.

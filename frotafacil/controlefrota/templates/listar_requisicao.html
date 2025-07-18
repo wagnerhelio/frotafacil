@@ -56,14 +56,19 @@
                         {% if request.user.is_staff %}
                             <a href="{% url 'aprovar_requisicao' r.id %}" class="btn btn-success btn-sm">Aprovar</a>
                             <a href="{% url 'recusar_requisicao' r.id %}" class="btn btn-danger btn-sm">Recusar</a>
-                            <a href="{% url 'excluir_requisicao' r.id %}" class="btn btn-secondary btn-sm">Excluir</a>
                         {% endif %}
-                    {% elif r.status_aprovacao == 'aprovada' and r.status == 'ativa' %}
+                    {% elif r.status_aprovacao == 'aprovada' and r.status == 'ativa' and r.nome_motorista %}
                         <a href="{% url 'finalizar_requisicao' r.id %}" class="btn btn-warning btn-sm">Finalizar</a>
                     {% elif r.status_aprovacao == 'aprovada' and r.status == 'finalizada' %}
-                        <span class="text-success">Finalizada</span>
+                        {# Não exibe mais o texto 'Finalizada' aqui #}
                     {% elif r.status_aprovacao == 'recusada' %}
                         <span class="text-danger">Recusada</span>
+                    {% endif %}
+                    {% if request.user.is_staff or request.user.is_superuser %}
+                        <a href="{% url 'excluir_requisicao' r.id %}" class="btn btn-secondary btn-sm">Excluir</a>
+                    {% endif %}
+                    {% if pode_reivindicar and not r.nome_motorista %}
+                        <a href="{% url 'reivindicar_requisicao' r.id %}" class="btn btn-dark btn-sm">Reivindicar</a>
                     {% endif %}
                 </td>
             </tr>
