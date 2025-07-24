@@ -12,6 +12,7 @@ Sistema moderno de gestão de frota desenvolvido em Django, com foco em padroniz
     <th>Home</th>
     <th>Home Veículos</th>
     <th>Home Requisições</th>
+    <th>Home Agentes</th>
     <th>Home Admin</th>
   </tr>
   <tr>
@@ -19,6 +20,7 @@ Sistema moderno de gestão de frota desenvolvido em Django, com foco em padroniz
     <td><a href="frotafacil/static/Docs/Home.png"><img src="frotafacil/static/Docs/Home.png" width="180"/></a></td>
     <td><a href="frotafacil/static/Docs/Home_Veiculos.png"><img src="frotafacil/static/Docs/Home_Veiculos.png" width="180"/></a></td>
     <td><a href="frotafacil/static/Docs/Home_Requisicoes.png"><img src="frotafacil/static/Docs/Home_Requisicoes.png" width="180"/></a></td>
+    <td><a href="frotafacil/static/Docs/Home_Agentes.png"><img src="frotafacil/static/Docs/Home_Agentes.png" width="180"/></a></td>
     <td><a href="frotafacil/static/Docs/Home_Admin.png"><img src="frotafacil/static/Docs/Home_Admin.png" width="180"/></a></td>
   </tr>
 </table>
