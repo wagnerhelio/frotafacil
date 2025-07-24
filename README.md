@@ -23,20 +23,9 @@ Sistema moderno de gestão de frota desenvolvido em Django, com foco em padroniz
   </tr>
 </table>
 
-| Login | Home | Home Veículos | Home Requisições | Home Admin |
-|-------|------|--------------|------------------|------------|
-| ![Login](frotafacil/static/Docs/Login.png) | ![Home](frotafacil/static/Docs/Home.png) | ![Home Veículos](frotafacil/static/Docs/Home_Veiculos.png) | ![Home Requisições](frotafacil/static/Docs/Home_Requisicoes.png) | ![Home Admin](frotafacil/static/Docs/Home_Admin.png) |
----
-
 ## 🚀 Passo a Passo para Subir o Projeto
 
-### 1. Clone o repositório
-```bash
-git clone https://github.com/seu-usuario/frotafacil.git
-cd frotafacil
-```
-
-### 2. Crie e ative o ambiente virtual (recomendado: 'frotafacil-env')
+### 1. Crie e ative o ambiente virtual (recomendado: 'frotafacil-env')
 ```bash
 # Windows
 python -m venv frotafacil-env
@@ -48,9 +37,24 @@ python3 -m venv frotafacil-env
 source frotafacil-env/bin/activate
 ```
 
+### 2. Clone o repositório pra dentro de frotafacil-env
+```bash
+cd frotafacil-env
+
+git clone https://github.com/wagnerhelio/frotafacil.git
+ou
+git clone https://github.com/ViniciusBenevides/Projetos-JF.git
+
+cd frotafacil
+```
+
 ### 3. Instale as dependências
 ```bash
 pip install -r requirements.txt
+
+Caso tenha atualizado o projeto atualize os requirements
+
+pip freeze > requirements.txt
 ```
 
 ### 5. Execute as migrações
@@ -64,21 +68,56 @@ python manage.py migrate
 python manage.py createsuperuser
 ```
 
-### 7. Inicie o servidor
+### 7. Inicie o servidor Local
 ```bash
 python manage.py runserver
 ```
+### 8. Inicie o servidor Linux 
 
----
+### Ajustando permissões do banco de dados SQLite
+
+Após subir o projeto no servidor Linux, ajuste as permissões do arquivo do banco de dados para evitar erros de "readonly database" ao rodar com Apache:
+
+```bash
+# Dê a posse do arquivo do banco para o usuário do Apache
+chown www-data:www-data /var/www/html/sistemas/frotafacil-env/frotafacil/db.sqlite3
+
+# Dê permissão de leitura e escrita para o usuário e grupo
+chmod 664 /var/www/html/sistemas/frotafacil-env/frotafacil/db.sqlite3
+
+# Dê permissão de escrita no diretório onde está o banco
+chown www-data:www-data /var/www/html/sistemas/frotafacil-env/frotafacil/
+chmod 775 /var/www/html/sistemas/frotafacil-env/frotafacil/
+```
+
+Se o Apache estiver rodando como outro usuário, substitua `www-data` pelo usuário correto.
+
+### Reiniciando o Apache e monitorando logs
+
+Após ajustar as permissões, reinicie o serviço do Apache para garantir que as alterações tenham efeito:
+
+```bash
+service apache2 restart
+```
+
+Se quiser limpar o log de erros antes de testar novamente:
+
+```bash
+truncate -s 0 /var/log/apache2/error.log
+```
+
+Para monitorar o log de erros em tempo real:
+
+```bash
+tail -f /var/log/apache2/error.log
+```
 
 ## ⚙️ URLs de Acesso
 
-- **Admin Django:**
-  - Windows: [http://127.0.0.1:8000/admin/](http://127.0.0.1:8000/admin/)
-  - Linux: [http://127.0.0.1:8000/frotafacil/admin/](http://127.0.0.1:8000/frotafacil/admin/)
-
-- **Configuração de Autenticação:**
-  - [http://127.0.0.1:8000/admin/auth_django/configuracaoautenticacao/](http://127.0.0.1:8000/admin/auth_django/configuracaoautenticacao/)
+- **Admin Django Local:**
+  - URL: [http://127.0.0.1:8000/admin/](http://127.0.0.1:8000/admin/)
+- **Admin Django Homolog Linux:**
+  - URL: [http://172.22.3.95/frotafacil/admin](http://127.0.0.1:8000/admin/)
 
   > **Importante:** Após criar o superusuário, acesse a tela acima e insira os dados dos usuários de serviço LDAP e o Azure Tenant ID para autenticação corporativa.
 
@@ -119,36 +158,13 @@ frotafacil/
 └── manage.py             # Script de gerenciamento Django
 ```
 
----
-
-## ⚙️ Configuração do .env
-
-Exemplo de arquivo `.env`:
-
-```env
-# Configurações do Django
-SECRET_KEY=sua-chave-secreta
-DEBUG=True
-ALLOWED_HOSTS=localhost,127.0.0.1
-PREFIX=0  # 0 para Windows, 1 para Linux
-
-# Configurações do Azure AD
-AZURE_TENANT_ID=seu-tenant-id
-AZURE_CLIENT_ID=seu-client-id
-AZURE_CLIENT_SECRET=seu-client-secret
-AZURE_RESOURCE=seu-resource
-AZURE_RELYING_PARTY_ID=seu-relying-party-id
-AZURE_AUDIENCE=seu-audience
-
-# Configurações do LDAP
-LDAP_SERVER=seu-servidor-ldap
-LDAP_PORT=389
-LDAP_BASE_DN=dc=exemplo,dc=com,dc=br
-```
-
----
-
 ## 📱 Funcionalidades Principais
+
+### Autenticação
+- Login local
+- LDAP
+- Azure AD
+- Controle de permissões
 
 ### Gestão de Veículos
 - Cadastro completo com informações detalhadas
@@ -162,22 +178,6 @@ LDAP_BASE_DN=dc=exemplo,dc=com,dc=br
 - Validações de disponibilidade
 - Controle de quilometragem
 
-### Autenticação
-- Login local
-- LDAP
-- Azure AD
-- Controle de permissões
-
----
-
-## 🤝 Contribuindo
-
-1. Faça um Fork do projeto
-2. Crie uma Branch para sua Feature (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a Branch (`git push origin feature/AmazingFeature`)
-5. Abra um Pull Request
-
 ---
 
 ## 📝 Licença
@@ -186,83 +186,4 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 
 ## 📬 Contato
 
-Seu Nome - [@seu_twitter](https://twitter.com/seu_twitter) - email@exemplo.com
-
-Link do Projeto: [https://github.com/seu-usuario/frotafacil](https://github.com/seu-usuario/frotafacil)
-
-## 🙏 Agradecimentos
-
-- [Django](https://www.djangoproject.com/)
-- [Bootstrap](https://getbootstrap.com/)
-- [Azure AD](https://azure.microsoft.com/)
-- [LDAP](https://www.openldap.org/)
-
-## Implantação
-
-### Ajustando permissões do banco de dados SQLite
-
-Após subir o projeto no servidor Linux, ajuste as permissões do arquivo do banco de dados para evitar erros de "readonly database" ao rodar com Apache:
-
-```bash
-# Dê a posse do arquivo do banco para o usuário do Apache
-chown www-data:www-data /var/www/html/sistemas/frotafacil-env/frotafacil/db.sqlite3
-
-# Dê permissão de leitura e escrita para o usuário e grupo
-chmod 664 /var/www/html/sistemas/frotafacil-env/frotafacil/db.sqlite3
-
-# Dê permissão de escrita no diretório onde está o banco
-chown www-data:www-data /var/www/html/sistemas/frotafacil-env/frotafacil/
-chmod 775 /var/www/html/sistemas/frotafacil-env/frotafacil/
-```
-
-Se o Apache estiver rodando como outro usuário, substitua `www-data` pelo usuário correto.
-
-### Reiniciando o Apache e monitorando logs
-
-Após ajustar as permissões, reinicie o serviço do Apache para garantir que as alterações tenham efeito:
-
-```bash
-service apache2 restart
-```
-
-Se quiser limpar o log de erros antes de testar novamente:
-
-```bash
-truncate -s 0 /var/log/apache2/error.log
-```
-
-Para monitorar o log de erros em tempo real:
-
-```bash
-tail -f /var/log/apache2/error.log
-```
-
-## Corrigindo erro de banco de dados SQLite readonly
-
-Se aparecer o erro:
-
-```
-django.db.utils.OperationalError: attempt to write a readonly database
-```
-
-Execute os comandos abaixo (ajuste o caminho se necessário):
-
-```bash
-# Dê a posse do arquivo do banco para o usuário do Apache
-chown www-data:www-data /var/www/html/sistemas/frotafacil-env/frotafacil/db.sqlite3
-
-# Dê permissão de leitura e escrita para o usuário e grupo
-chmod 664 /var/www/html/sistemas/frotafacil-env/frotafacil/db.sqlite3
-
-# Dê permissão de escrita no diretório onde está o banco
-chown www-data:www-data /var/www/html/sistemas/frotafacil-env/frotafacil/
-chmod 775 /var/www/html/sistemas/frotafacil-env/frotafacil/
-```
-
-Depois, reinicie o Apache:
-
-```bash
-service apache2 restart
-```
-
-Se o Apache estiver rodando como outro usuário, substitua `www-data` pelo usuário correto.
+Wagner Hélio - wagner.helio@discente.ufg.br
