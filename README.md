@@ -146,18 +146,48 @@ tail -f /var/log/apache2/error.log
 
 ```
 frotafacil/
-├── controlefrota/           # Aplicação principal
-│   ├── models/             # Modelos do banco de dados
-│   ├── views/              # Views e lógica de negócio
-│   ├── forms/              # Formulários
-│   └── templates/          # Templates HTML
-├── static/                 # Arquivos estáticos
-│   ├── css/               # Estilos CSS
-│   ├── js/                # Scripts JavaScript
-│   └── img/               # Imagens
-├── templates/             # Templates base
-├── media/                 # Arquivos de mídia
-└── manage.py             # Script de gerenciamento Django
+├── auth_django/                # Módulo de autenticação de usuários
+│   ├── admin.py                # Configurações do Django Admin para autenticação
+│   ├── apps.py                 # Configuração da aplicação para o Django
+│   ├── autenticar_usuario.py   # Lógica personalizada de autenticação
+│   ├── migrations/             # Migrações do banco de dados (autenticação)
+│   ├── models.py               # Modelos de dados de autenticação
+│   ├── tests.py                # Testes automatizados de autenticação
+│   ├── urls.py                 # Rotas/URLs de autenticação
+│   └── views.py                # Views de autenticação
+├── controlefrota/              # Aplicação principal de controle de frota
+│   ├── __init__.py             # Inicialização do pacote
+│   ├── admin.py                # Configurações do Django Admin para frota
+│   ├── apps.py                 # Configuração da aplicação para o Django
+│   ├── forms_agente.py         # Formulários para agentes
+│   ├── forms_requisicao.py     # Formulários para requisições
+│   ├── forms_veiculo.py        # Formulários para veículos
+│   ├── importa_veiculos.py     # Script de importação de veículos
+│   ├── migrations/             # Migrações do banco de dados (frota)
+│   ├── models_agente.py        # Modelos de dados de agentes
+│   ├── models_ferias.py        # Modelos de dados de férias de agentes
+│   ├── models_requisicao.py    # Modelos de dados de requisições
+│   ├── models_veiculo.py       # Modelos de dados de veículos
+│   ├── models.py               # Modelos centralizados ou importações
+│   ├── templates/              # Templates HTML da aplicação de frota
+│   ├── templatetags/           # Tags customizadas para templates
+│   ├── tests.py                # Testes automatizados da aplicação de frota
+│   ├── urls.py                 # Rotas/URLs da aplicação de frota
+│   ├── views_agente.py         # Views para agentes
+│   ├── views_requisicao.py     # Views para requisições
+│   └── views_veiculo.py        # Views para veículos
+├── frotafacil/                 # Configurações globais do projeto Django
+│   ├── asgi.py                 # Configuração para ASGI
+│   ├── settings.py             # Configurações principais do projeto
+│   ├── templates/              # Templates HTML globais (login, home)
+│   ├── urls.py                 # Rotas/URLs globais
+│   └── wsgi.py                 # Configuração para WSGI
+├── static/                     # Arquivos estáticos (CSS, JS, imagens)
+│   ├── admin/                  # Arquivos estáticos do admin do Django
+│   ├── Docs/                   # Imagens de documentação do sistema
+│   ├── img/                    # Imagens do sistema
+│   └── ...                     # Outros arquivos estáticos (planilhas, etc)
+├── manage.py                   # Script principal de gerenciamento Django
 ```
 
 ## 📱 Funcionalidades Principais
