@@ -1,7 +1,10 @@
-{% extends 'home_veiculo.html' %}
+{% extends 'home_requisicao.html' %}
+{% block title %}Listar Requisição{% endblock %}
 {% block menu_itens %}
 <a href="{% url 'cadastrar_requisicao' %}">➕ <span class="menu-text">Cadastrar Requisição</span></a>
 <a href="{% url 'home_requisicao' %}">📋 <span class="menu-text">Requisição</span></a>
+<a href="{% url 'home' %}" class="back-btn">🏠 <span class="menu-text">Voltar ao Menu</span></a>
+<a href="{% url 'admin:index' %}" class="admin">⚙️ <span class="menu-text">Administração</span></a>
 {% endblock %}
 {% block content %}
 <div class="container mt-4">

@@ -81,6 +81,10 @@ python manage.py runserver
 Após subir o projeto no servidor Linux, ajuste as permissões do arquivo do banco de dados para evitar erros de "readonly database" ao rodar com Apache:
 
 ```bash
+#De permissão para o usuario que irá realizar a motificação caso esteja utilizando o MobaXtreame
+sudo chown -R go2514ps:'domain users' /var/www/html/sistemas/frotafacil-env
+sudo chmod -R u+rwX /var/www/html/sistemas/frotafacil-env
+
 # Dê a posse do arquivo do banco para o usuário do Apache
 chown www-data:www-data /var/www/html/sistemas/frotafacil-env/frotafacil/db.sqlite3
 
@@ -128,7 +132,7 @@ tail -f /var/log/apache2/error.log
 ## 🧰 Tecnologias Utilizadas
 
 - Python 3.10+
-- Django 5.2
+- Django 3.2.25
 - Bootstrap 5
 - SQLite (desenvolvimento) / PostgreSQL (produção)
 - Azure AD / LDAP para autenticação
